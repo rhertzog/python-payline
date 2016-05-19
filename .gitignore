@@ -90,3 +90,6 @@ ENV/
 .ropeproject
 
 db.sqlite3
+
+pypayline/payline_secrets.py
+WebPaymentAPI/
