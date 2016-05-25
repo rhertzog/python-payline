@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Python client for the Payline SOAP API"""
 
 import base64
 from datetime import datetime
@@ -7,7 +8,7 @@ from decimal import Decimal
 from pysimplesoap.client import SoapClient, SoapFault
 
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 
 class InvalidCurrencyError(Exception):
@@ -26,12 +27,13 @@ class PaylineClient(object):
     ):
         """
         Init the SOAP by getting the WSDL of the service. It is recommeded to cache it
-        * merchant_id : Your Payline Merchant id
-        * access_key : Your Payline access key
-        * contract number : Your Payline contract number
-        * cache : Name of directory where to cache the WSDL file (recommended to do it). Cache is disabled if None
-        * trace : print some debug logs
-        * homologation : if True use the homologation host for test. If false, user the regular host
+
+        :param merchant_id : Your Payline Merchant id
+        :param access_key : Your Payline access key
+        :param contract number : Your Payline contract number
+        :param cache : Name of directory where to cache the WSDL file (recommended to do it). Cache is disabled if None
+        :param trace : print some debug logs
+        :param homologation : if True use the homologation host for test. If false, user the regular host
         """
 
         self.merchant_id, self.access_key, self.contract_number = merchant_id, access_key, contract_number
@@ -62,8 +64,26 @@ class PaylineClient(object):
         patched_location = location.replace('http://host', payline_host)
         self.soap_client.services['WebPaymentAPI']['ports']['WebPaymentAPI']['location'] = patched_location
 
-    def do_web_payment(self, amount, currency, order_ref, return_url, cancel_url, authorization_mode=100):
-        """make a new payment"""
+    def do_web_payment(self, amount, currency, order_ref, return_url, cancel_url, payline_action=100):
+        """
+        Calls the Payline SOAP API for making a new payment
+
+        :param amount: amount to pay
+        :param currency: currency (currenttly supported EUR and USD)
+        :param order_ref: The order refernce (in your shopping system) corresponding to the payment
+        :param return_url: The Url to go after payment
+        :param cancel_url: The Url to go if user cancels the payment
+        :param payline_action: Payline code. Can be 100 (Autorisation) or 101 (Autorisation + validation)
+            See Payline docs
+        :return: Payline response as a dictionnary with the following keys
+            - redirectURL : where to redirect the user
+            - token = a token for the query
+            - result as a dictionnary
+                - code: '00000' if successfull
+                - longMessage = long message
+                - shortMessage
+        :raise PaylineError if call to SOAP API fails or InvalidCurrencyError if currency value is not supported
+        """
 
         # Check and convert params
         formatted_amount = int(amount * 100)
