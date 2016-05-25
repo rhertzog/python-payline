@@ -64,11 +64,14 @@ class PaylineClient(object):
         # Check and convert params
         formatted_amount = int(amount * 100)
 
-        if currency == u'€':
-            formatted_currency = 978
-        elif currency == u'$':
-            formatted_currency = 840
-        else:
+        currencies = {
+            u'EUR': 978,
+            u'USD': 840,
+        }
+
+        formatted_currency = currencies.get(currency, None)
+
+        if formatted_currency is None:
             raise InvalidCurrencyError(u'{0} currency is not supported'.format(currency))
 
         # Call the doWebPaymentRequest webservice
@@ -121,6 +124,6 @@ if __name__ == '__main__':
     )
 
     client.do_web_payment(
-        amount=Decimal("12.50"), currency=u"€", order_ref=dummy_order_ref,
+        amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref,
         return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
     )
