@@ -78,7 +78,7 @@ class PaylineClient(object):
                 'amount': formatted_amount,
                 'currency': formatted_currency,
                 'action': authorization_mode,  # Authorization
-                'mode': 'FUL',  # TODO
+                'mode': 'CPT',  # TODO
                 'contractNumber': self.contract_number,
                 #'deferredActionDate': 'dd/mm/yy',
             },
@@ -89,6 +89,10 @@ class PaylineClient(object):
                 'date': datetime.now().strftime('%d/%m/%Y %H:%M')
 
             },
+            buyer={},
+            owner={},
+            recurring={},
+            selectedContractList={},
             securityMode='SSL',
             returnURL=return_url,
             cancelURL=cancel_url
@@ -98,7 +102,7 @@ class PaylineClient(object):
 
 
 if __name__ == '__main__':
-    dummy_order_ref = datetime.now().strftime('%Y%m%d%H:%M')
+    dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
     try:
         from payline_secrets import MERCHANT_ID, ACCESS_KEY, CONTRACT_NUMBER
