@@ -4,13 +4,17 @@ import base64
 from datetime import datetime
 from decimal import Decimal
 
-from pysimplesoap.client import SoapClient
+from pysimplesoap.client import SoapClient, SoapFault
 
 
 VERSION = "0.0.2"
 
 
 class InvalidCurrencyError(Exception):
+    pass
+
+
+class PaylineError(Exception):
     pass
 
 
@@ -75,33 +79,37 @@ class PaylineClient(object):
             raise InvalidCurrencyError(u'{0} currency is not supported'.format(currency))
 
         # Call the doWebPaymentRequest webservice
-        response = self.soap_client.doWebPayment(
-            version="3",
-            payment={
-                'amount': formatted_amount,
-                'currency': formatted_currency,
-                'action': authorization_mode,  # Authorization
-                'mode': 'CPT',  # TODO
-                'contractNumber': self.contract_number,
-                #'deferredActionDate': 'dd/mm/yy',
-            },
-            order={
-                'ref': order_ref,
-                'amount': formatted_amount,
-                'currency': formatted_currency,
-                'date': datetime.now().strftime('%d/%m/%Y %H:%M')
 
-            },
-            buyer={},
-            owner={},
-            recurring={},
-            selectedContractList={},
-            securityMode='SSL',
-            returnURL=return_url,
-            cancelURL=cancel_url
-        )
+        try:
+            response = self.soap_client.doWebPayment(
+                version="3",
+                payment={
+                    'amount': formatted_amount,
+                    'currency': formatted_currency,
+                    'action': payline_action,
+                    'mode': 'CPT',  # TODO
+                    'contractNumber': self.contract_number,
+                    #'deferredActionDate': 'dd/mm/yy',
+                },
+                order={
+                    'ref': order_ref,
+                    'amount': formatted_amount,
+                    'currency': formatted_currency,
+                    'date': datetime.now().strftime('%d/%m/%Y %H:%M')
 
-        print response
+                },
+                buyer={},
+                owner={},
+                recurring={},
+                selectedContractList={},
+                securityMode='SSL',
+                returnURL=return_url,
+                cancelURL=cancel_url
+            )
+        except SoapFault as err:
+            raise PaylineError(unicode(err))
+
+        return response
 
 
 if __name__ == '__main__':
