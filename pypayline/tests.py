@@ -25,7 +25,7 @@ class PaylineClient(PaylineClientBase):
 class SoapApiTestCase(unittest.TestCase):
 
     def setUp(self):
-        """initilaize mocks"""
+        """initialize mocks"""
         if USE_MOCK:
             self.merchant_id, self.access_key, self.contract_number = u"12345678901234", u"abCdeFgHiJKLmNoPqrst", u"1234567"
         else:
