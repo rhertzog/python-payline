@@ -2,8 +2,8 @@
 """
 Python client for the Payline SOAP API
 unit tests
-python tests.py [soap]
-if soap -> Use the real SOAP API
+python tests.py [+soap]
+if +soap -> Use the real SOAP API
 """
 
 from datetime import datetime
