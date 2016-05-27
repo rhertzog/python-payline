@@ -6,6 +6,7 @@ client class
 
 from __future__ import print_function
 
+
 import base64
 from datetime import datetime
 from decimal import Decimal
@@ -17,6 +18,11 @@ from pypayline.exceptions import InvalidCurrencyError, PaylineApiError, PaylineA
 class PaylineClient(object):
     """Class for calling the payline services"""
     backend_class = SoapBackend
+
+    currencies = {
+        u'EUR': 978,
+        u'USD': 840,
+    }
 
     def __init__(
             self, merchant_id, access_key, contract_number, cache='WebPaymentAPI', trace=False, homologation=False
@@ -83,17 +89,12 @@ class PaylineClient(object):
         # Check and convert params
         formatted_amount = int(amount * 100)
 
-        currencies = {
-            u'EUR': 978,
-            u'USD': 840,
-        }
-
-        formatted_currency = currencies.get(currency, None)
+        formatted_currency = self.currencies.get(currency, None)
 
         if formatted_currency is None:
             raise InvalidCurrencyError(u'{0} currency is not supported'.format(currency))
 
-        return self.backend.doWebPayment(
+        response = self.backend.doWebPayment(
             version="3",
             payment={
                 'amount': formatted_amount,
@@ -118,6 +119,35 @@ class PaylineClient(object):
             returnURL=return_url,
             cancelURL=cancel_url
         )
+        return response['redirectURL'], response['token']
+
+    def get_web_payment_details(self, token):
+        """
+        Get the status of a payment
+        :param token: Th epayment token (returned by do_web_payment
+        :return: tuple
+         - is_transaction_ok = no fraud detected
+         - order_ref: the order id,
+         - amount: the paid amount,
+         - currency: the used currency
+         - data: the raw data
+        """
+        data = self.backend.getWebPaymentDetails(
+            version="3",
+            token=token
+        )
+
+        is_transaction_ok = not int(data['transaction']['isPossibleFraud'])
+        amount = int(data['payment']['amount'])
+        amount_int, amout_decimal = amount // 100, amount % 100
+        amount = Decimal('{0}.{1:02}'.format(amount_int, amout_decimal))
+
+        currency_reverse = dict([(v, k) for (k, v) in self.currencies.items()])
+        currency = currency_reverse[int(data['payment']['currency'])]
+
+        order_ref = data['order']['ref']
+
+        return is_transaction_ok, order_ref, amount, currency, data
 
 
 if __name__ == '__main__':
@@ -143,10 +173,22 @@ if __name__ == '__main__':
         print("#AUTH ERR:", err)
 
     try:
-        redirect_url = client.do_web_payment(
-            amount=Decimal("10.00"), currency=u"EUR", order_ref=dummy_order_ref,
+        redirect_url, token = client.do_web_payment(
+            amount=Decimal("1.00"), currency=u"EUR", order_ref=dummy_order_ref,
             return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
         )
         print("Redirect to", redirect_url)
+        print("Token", token)
+
+        try:
+            raw_input('Press Enter to get payment details')
+        except:
+            input('Press Enter to get payment details')
+
+        is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(token)
+        print('> OK?', is_transaction_ok)
+        print('> Order', order_ref, ":", amount, currency)
+        print("********\n", raw_data, '\n*******')
+
     except PaylineApiError as err:
         print("#API ERR:", err)

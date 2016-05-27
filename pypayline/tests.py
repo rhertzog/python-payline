@@ -111,11 +111,19 @@ class SoapApiTestCase(unittest.TestCase):
             homologation=True
         )
 
-        redirect_url = client.do_web_payment(
+        redirect_url, token = client.do_web_payment(
             amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref,
             return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
         )
         self.assertNotEqual(redirect_url, None)
+
+        if USE_MOCK:
+            is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(token)
+            self.assertEqual(is_transaction_ok, True)
+            self.assertEqual(amount, Decimal("12.50"))
+            self.assertEqual(currency, u"EUR")
+            self.assertEqual(order_ref, dummy_order_ref)
+            self.assertEqual(type(raw_data), dict)
 
     def test_call_api_usd(self):
         """check call API in USD"""
@@ -127,11 +135,19 @@ class SoapApiTestCase(unittest.TestCase):
             homologation=True
         )
 
-        redirect_url = client.do_web_payment(
+        redirect_url, token = client.do_web_payment(
             amount=Decimal("12.50"), currency=u"USD", order_ref=dummy_order_ref,
             return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
         )
         self.assertNotEqual(redirect_url, None)
+
+        if USE_MOCK:
+            is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(token)
+            self.assertEqual(is_transaction_ok, True)
+            self.assertEqual(amount, Decimal("12.50"))
+            self.assertEqual(currency, u"USD")
+            self.assertEqual(order_ref, dummy_order_ref)
+            self.assertEqual(type(raw_data), dict)
 
     def test_call_api_cache(self):
         """check call API with cache set"""
@@ -143,7 +159,7 @@ class SoapApiTestCase(unittest.TestCase):
             homologation=True, cache=u"WebPaymentAPI"
         )
 
-        redirect_url = client.do_web_payment(
+        redirect_url, token = client.do_web_payment(
             amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref,
             return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
         )
@@ -279,6 +295,49 @@ class SoapApiTestCase(unittest.TestCase):
             PaylineAuthError, client.do_web_payment,
             amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref,
             return_url='http://freexian.com/success/', cancel_url='/cancel/'
+        )
+
+    def test_call_api_eur_not_visited(self):
+        """check call API in EUR get_web_payment_details should fail if not visited"""
+
+        dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
+
+        client = PaylineClient(
+            merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
+            homologation=True
+        )
+
+        redirect_url, token = client.do_web_payment(
+            amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref,
+            return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
+        )
+        self.assertNotEqual(redirect_url, None)
+
+        if USE_MOCK:
+            client.backend.cancelled = True
+
+        self.assertRaises(
+            PaylineApiError, client.get_web_payment_details, token
+        )
+
+    def test_call_api_wrong_token(self):
+        """check call API in EUR get_web_payment_details should fail if wrong token"""
+
+        dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
+
+        client = PaylineClient(
+            merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
+            homologation=True
+        )
+
+        redirect_url, token = client.do_web_payment(
+            amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref,
+            return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
+        )
+        self.assertNotEqual(redirect_url, None)
+
+        self.assertRaises(
+            PaylineApiError, client.get_web_payment_details, token + "AAA"
         )
 
 

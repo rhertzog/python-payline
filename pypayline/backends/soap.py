@@ -29,7 +29,19 @@ class SoapBackend(object):
             response = self.soap_client.doWebPayment(**data)
             if response['result']['code'] != u"00000":
                 raise PaylineApiError(response['result']['longMessage'])
-            return response['redirectURL']
+            return response['redirectURL'], response['token']
+        except SoapFault as err:
+            raise PaylineApiError(unicode(err))
+        except HTTPError as err:
+            raise PaylineAuthError(u'Error while creating client. Err HTTP {0}'.format(err.code))
+
+    def getWebPaymentDetails(self, **data):
+        """call the getWebPaymentDetails SOAP API"""
+        try:
+            response = self.soap_client.getWebPaymentDetails(**data)
+            if response['result']['code'] != u"00000":
+                raise PaylineApiError(response['result']['longMessage'])
+            return response
         except SoapFault as err:
             raise PaylineApiError(unicode(err))
         except HTTPError as err:
