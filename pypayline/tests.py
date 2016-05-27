@@ -2,11 +2,14 @@
 """
 Python client for the Payline SOAP API
 unit tests
+python tests.py [soap]
+if soap -> Use the real SOAP API
 """
 
 from datetime import datetime
 from decimal import Decimal
 import re
+import sys
 import unittest
 
 from pypayline.backends.mock import SoapMockBackend
@@ -14,7 +17,17 @@ from pypayline.client import PaylineClient as PaylineClientBase
 from pypayline.exceptions import InvalidCurrencyError, PaylineApiError, PaylineAuthError
 
 
-USE_MOCK = True
+def use_mock():
+    """if +soap option is given in command line activate this mode"""
+    soap_option = '+soap'
+    if soap_option in sys.argv:
+        # remove it from command line for regular unit test options
+        sys.argv.remove(soap_option)
+        return False
+    return True
+
+
+USE_MOCK = use_mock()
 
 
 class PaylineClient(PaylineClientBase):
