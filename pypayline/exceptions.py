@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Python client for the Payline SOAP API"""
+"""
+Python client for the Payline SOAP API
+Exceptions
+"""
 
 
 class InvalidCurrencyError(Exception):
@@ -7,6 +10,11 @@ class InvalidCurrencyError(Exception):
     pass
 
 
-class PaylineError(Exception):
-    """This exception is raised when Payline SOAP APi raises an error"""
+class PaylineAuthError(Exception):
+    """This exception is raised when connection to Payline SOAP API raises an error"""
+    pass
+
+
+class PaylineApiError(Exception):
+    """This exception is raised when Payline SOAP API raises an error"""
     pass

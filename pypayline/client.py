@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Python client for the Payline SOAP API"""
+"""
+Python client for the Payline SOAP API
+client class
+"""
 
 from __future__ import print_function
 
@@ -7,8 +10,8 @@ import base64
 from datetime import datetime
 from decimal import Decimal
 
-from pypayline.backends import SoapBackend
-from pypayline.exceptions import InvalidCurrencyError
+from pypayline.backends.soap import SoapBackend
+from pypayline.exceptions import InvalidCurrencyError, PaylineApiError, PaylineAuthError
 
 
 class PaylineClient(object):
@@ -38,11 +41,11 @@ class PaylineClient(object):
         }
 
         if homologation:
-            payline_host = 'https://homologation.payline.com'
+            payline_host = u'https://homologation.payline.com'
         else:
-            payline_host = 'https://services.payline.com'
+            payline_host = u'https://services.payline.com'
 
-        wsdl_url = payline_host + '/V4/services/WebPaymentAPI?wsdl'
+        wsdl_url = payline_host + u'/V4/services/WebPaymentAPI?wsdl'
         # Create the webservice client
         self.backend = self.backend_class(
             wsdl=wsdl_url,
@@ -52,9 +55,9 @@ class PaylineClient(object):
         )
 
         # Patch location : The WSDL doesn't have the right location for the service
-        location = self.backend.soap_client.services['WebPaymentAPI']['ports']['WebPaymentAPI']['location']
-        patched_location = location.replace('http://host', payline_host)
-        self.backend.soap_client.services['WebPaymentAPI']['ports']['WebPaymentAPI']['location'] = patched_location
+        location = self.backend.services['WebPaymentAPI']['ports']['WebPaymentAPI']['location']
+        patched_location = location.replace(u'http://host', payline_host)
+        self.backend.services['WebPaymentAPI']['ports']['WebPaymentAPI']['location'] = patched_location
 
     def do_web_payment(self, amount, currency, order_ref, return_url, cancel_url, payline_action=100):
         """
@@ -130,15 +133,20 @@ if __name__ == '__main__':
             CONTRACT_NUMBER = "123456"
         """)
 
-    merchant_id, access_key, contrat_number = MERCHANT_ID, ACCESS_KEY, CONTRACT_NUMBER
+    merchant_id, access_key, contract_number = MERCHANT_ID, ACCESS_KEY, CONTRACT_NUMBER
 
-    client = PaylineClient(
-        merchant_id=merchant_id, access_key=access_key, contract_number=contrat_number, homologation=True, #cache=None
-    )
+    try:
+        client = PaylineClient(
+            merchant_id=merchant_id, access_key=access_key, contract_number=contract_number, homologation=True, #cache=None
+        )
+    except PaylineAuthError as err:
+        print("#AUTH ERR:", err)
 
-    print(
-        client.do_web_payment(
-            amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref,
+    try:
+        redirect_url = client.do_web_payment(
+            amount=Decimal("10.00"), currency=u"EUR", order_ref=dummy_order_ref,
             return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
         )
-    )
+        print("Redirect to", redirect_url)
+    except PaylineApiError as err:
+        print("#API ERR:", err)
