@@ -15,16 +15,18 @@ from pypayline.exceptions import PaylineAuthError, PaylineApiError
 
 TOKEN = u'3cXyapUchee8x645C6782541635718391'
 
+LAST_DATA = {
+
+}
 
 class SoapMockBackend(object):
     """Mock the SOAP API client"""
+
     def __init__(self, *args, **kwargs):
         """
         Use dummy merchant_id = = u"12345678901234" and access_key = u"abCdeFgHiJKLmNoPqrst" in order to use this mock
         """
         self.http_headers = kwargs['http_headers']
-
-        self.last_order = self.last_payment = None
         self.cancelled = False
 
         # Only the required data
@@ -88,15 +90,14 @@ class SoapMockBackend(object):
 
     def doWebPayment(self, **data):
         """call the doWebPayment SOAP API"""
-        self.last_payment = None
-        self.last_order = None
+        LAST_DATA.clear()
         response = self._handle_response(data)
         if response['result']['code'] == u'00000':
-            self.last_payment = data['payment']
-            self.last_order = data['order']
+            LAST_DATA['last_payment'] = data['payment']
+            LAST_DATA['last_order'] = data['order']
         else:
             raise PaylineApiError(response['result']['longMessage'])
-        return response
+        return response['redirectURL'], response['token']
 
     def getWebPaymentDetails(self, **data):
         """call the getWebPaymentDetails SOAP API"""
@@ -109,7 +110,7 @@ class SoapMockBackend(object):
                 'id': '1234567890',
                 'date': datetime.now().strftime('%d/%m/%Y %H:%M'),
                 'isDuplicated': False,
-                'isPossibleFraud': False,
+                'isPossibleFraud': LAST_DATA['last_payment']["amount"] >= 1000000,
                 'fraudResult': '',
                 'fraudResultDetails': '',
                 'explanation': '',
@@ -118,8 +119,8 @@ class SoapMockBackend(object):
                 'externalWalletType': 'Me',
                 'externalWalletCont ractNumber': '',
             },
-            'payment': self.last_payment,
-            'order': self.last_order,
+            'payment': LAST_DATA.get('last_payment', None),
+            'order': LAST_DATA.get('last_order', None),
             'result': {
                 'code': u'00000',
                 'longMessage': u'Transaction approved',
@@ -133,9 +134,8 @@ class SoapMockBackend(object):
         if self.cancelled:
             response = self.get_response(u"Payment cancelled by the buyer")
 
-        if self.last_payment is None:
+        if 'last_payment' not in LAST_DATA:
             response = self.get_response(u"The consummer is not redirected on payment web pages")
-
 
         if response['result']['code'] == u'00000':
             return response

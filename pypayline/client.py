@@ -94,7 +94,7 @@ class PaylineClient(object):
         if formatted_currency is None:
             raise InvalidCurrencyError(u'{0} currency is not supported'.format(currency))
 
-        response = self.backend.doWebPayment(
+        redirect_url, token = self.backend.doWebPayment(
             version="3",
             payment={
                 'amount': formatted_amount,
@@ -119,7 +119,7 @@ class PaylineClient(object):
             returnURL=return_url,
             cancelURL=cancel_url
         )
-        return response['redirectURL'], response['token']
+        return redirect_url, token
 
     def get_web_payment_details(self, token):
         """
