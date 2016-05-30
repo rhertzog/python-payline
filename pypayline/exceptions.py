@@ -18,3 +18,8 @@ class PaylineAuthError(Exception):
 class PaylineApiError(Exception):
     """This exception is raised when Payline SOAP API raises an error"""
     pass
+
+
+class ArgumentsError(Exception):
+    """The api is called with wrong arguments"""
+    pass

@@ -172,6 +172,31 @@ class SoapApiTestCase(unittest.TestCase):
         )
         self.assertNotEqual(redirect_url, None)
 
+    def test_call_api_recurring(self):
+        """check call API with recurring"""
+        logger.setLevel(logging.DEBUG)
+        dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
+
+        client = PaylineClient(
+            merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
+            homologation=True
+        )
+
+        redirect_url, token = client.do_web_payment(
+            amount=Decimal("12.50"), currency=u"USD", order_ref=dummy_order_ref,
+            recurring_period_in_months=3, recurring_times=4,
+            return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
+        )
+        self.assertNotEqual(redirect_url, None)
+
+        if USE_MOCK:
+            is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(token)
+            self.assertEqual(is_transaction_ok, True)
+            self.assertEqual(amount, Decimal("12.50"))
+            self.assertEqual(currency, u"USD")
+            self.assertEqual(order_ref, dummy_order_ref)
+            self.assertEqual(type(raw_data), dict)
+
     def test_call_api_invalid_amount(self):
         """Check error if wrong value"""
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
