@@ -6,11 +6,15 @@ SOAP Backends : for real usage
 
 from __future__ import print_function
 
+import logging
 from urllib2 import HTTPError
 
 from pysimplesoap.client import SoapClient, SoapFault
 
 from pypayline.exceptions import PaylineAuthError, PaylineApiError
+
+
+logger = logging.getLogger(u'pypayline')
 
 
 class SoapBackend(object):
@@ -26,7 +30,9 @@ class SoapBackend(object):
     def doWebPayment(self, **data):
         """call the doWebPayment SOAP API"""
         try:
+            logger.debug('> {0}'.format(data))
             response = self.soap_client.doWebPayment(**data)
+            logger.debug('< {0}'.format(response))
             if response['result']['code'] != u"00000":
                 raise PaylineApiError(response['result']['longMessage'])
             return response['redirectURL'], response['token']

@@ -8,6 +8,7 @@ if +soap -> Use the real SOAP API
 
 from datetime import datetime
 from decimal import Decimal
+import logging
 import re
 import sys
 import unittest
@@ -15,6 +16,10 @@ import unittest
 from pypayline.backends.mock import SoapMockBackend
 from pypayline.client import PaylineClient as PaylineClientBase
 from pypayline.exceptions import InvalidCurrencyError, PaylineApiError, PaylineAuthError
+
+
+logger = logging.getLogger('pypayline')
+logger.addHandler(logging.StreamHandler())
 
 
 def use_mock():
@@ -39,6 +44,8 @@ class SoapApiTestCase(unittest.TestCase):
 
     def setUp(self):
         """initialize mocks"""
+        logger.setLevel(logging.INFO)
+
         if USE_MOCK:
             self.merchant_id, self.access_key, self.contract_number = u"12345678901234", u"abCdeFgHiJKLmNoPqrst", u"1234567"
         else:
