@@ -183,8 +183,9 @@ class PaylineClient(object):
         currency = currency_reverse[int(data['payment']['currency'])]
 
         order_ref = data['order']['ref']
+        result_code = data['result']['code']
 
-        return is_transaction_ok, order_ref, amount, currency, data
+        return result_code, is_transaction_ok, order_ref, amount, currency, data
 
 
 if __name__ == '__main__':
@@ -246,8 +247,10 @@ if __name__ == '__main__':
             except:
                 input('Press Enter to get payment details')
 
-            is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(token)
-            print('> OK?', is_transaction_ok)
+            result_code, is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(
+                token
+            )
+            print('> OK?', result_code, is_transaction_ok)
             print('> Order', order_ref, ":", amount, currency)
             print("********\n", raw_data, '\n*******')
 

@@ -45,8 +45,6 @@ class SoapBackend(object):
         """call the getWebPaymentDetails SOAP API"""
         try:
             response = self.soap_client.getWebPaymentDetails(**data)
-            if response['result']['code'] != u"00000":
-                raise PaylineApiError(response['result']['longMessage'])
             return response
         except SoapFault as err:
             raise PaylineApiError(unicode(err))

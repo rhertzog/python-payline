@@ -137,7 +137,4 @@ class SoapMockBackend(object):
         if 'last_payment' not in LAST_DATA:
             response = self.get_response(u"The consummer is not redirected on payment web pages")
 
-        if response['result']['code'] == u'00000':
-            return response
-        else:
-            raise PaylineApiError(response['result']['longMessage'])
+        return response
