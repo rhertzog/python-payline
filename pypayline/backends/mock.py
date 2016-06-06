@@ -142,6 +142,8 @@ class SoapMockBackend(object):
     def getPaymentRecord(self, **data):
         """call the doWebPayment SOAP API"""
 
+        payment_record_id = data['paymentRecordId']
+
         response = {
             'result': {
                 'code': u'00000',
@@ -181,7 +183,7 @@ class SoapMockBackend(object):
                 }
             ],
             'order': {
-                'ref': '1',
+                'ref': payment_record_id,  # for something simple return the paymentRecordId arg
             },
             'privateDataList': {},
             'walletId': '',
