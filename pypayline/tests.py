@@ -373,6 +373,21 @@ class SoapApiTestCase(unittest.TestCase):
         returned_values = client.get_web_payment_details(token + "AAA")
         self.assertNotEqual(returned_values[0], '00000')
 
+    def test_call_api_payment_record(self):
+        """check call API with recurring"""
+        logger.setLevel(logging.DEBUG)
+
+        client = PaylineClient(
+            merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
+            homologation=True
+        )
+
+        response = client.get_payment_record(
+            self.contract_number, '12345'
+        )
+        self.assertTrue(type(response) is dict)
+
+
 
 if __name__ == '__main__':
     unittest.main()

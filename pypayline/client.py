@@ -204,6 +204,19 @@ class PaylineClient(object):
 
         return result_code, is_transaction_ok, order_ref, amount, currency, data
 
+    def get_payment_record(self, contract_number, payment_record_id):
+        """
+        Get the status of a payment
+        :param contract_number: Contract number
+        :param payment_record_id: record identifier, Received by IPN
+        :return: response dictionnary
+        """
+        data = self.backend.getPaymentRecord(
+            contractNumber=contract_number,
+            paymentRecordId=payment_record_id
+        )
+        return data
+
 
 if __name__ == '__main__':
 

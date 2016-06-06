@@ -51,3 +51,13 @@ class SoapBackend(object):
         except HTTPError as err:
             raise PaylineAuthError(u'Error while creating client. Err HTTP {0}'.format(err.code))
 
+    def getPaymentRecord(self, **data):
+        """call the getPaymentRecord SOAP API"""
+        try:
+            response = self.soap_client.getPaymentRecord(**data)
+            return response
+        except SoapFault as err:
+            raise PaylineApiError(unicode(err))
+        except HTTPError as err:
+            raise PaylineAuthError(u'Error while creating client. Err HTTP {0}'.format(err.code))
+

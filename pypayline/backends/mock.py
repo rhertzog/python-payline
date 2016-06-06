@@ -138,3 +138,51 @@ class SoapMockBackend(object):
             response = self.get_response(u"The consummer is not redirected on payment web pages")
 
         return response
+
+    def getPaymentRecord(self, **data):
+        """call the doWebPayment SOAP API"""
+
+        response = {
+            'result': {
+                'code': u'00000',
+                'longMessage': u'Transaction approved',
+                'shortMessage': u'Transaction approved',
+            },
+            'recurring': {
+                'firstAmount': 1000,
+                'amount': 1000,
+                'billingCycle': 40,
+                'startDate': '06/06/2016',
+                'billingLeft': 3,
+                'billingDay': '01',
+            },
+            'isDisabled': 0,
+            'disabledDate': '',
+            'billingRecordList': [
+                {
+                    'date': u"06/06/2016",
+                    'amount': 1000,
+                    'status': 0,
+                    'return': {
+                        'code': '00000',
+                        'longMessage': u'Transaction approved',
+                        'shortMessage': u'Transaction approved',
+                    },
+                    'transaction': {
+                        'id': '123456789',
+                        'isPossibleFraud': False,
+                        'isDuplicated': False,
+                        'date': u"06/06/2016",
+                    },
+                    'authorization': {
+                        'number': '123456789',
+                        'date': u"06/06/2016",
+                    }
+                }
+            ],
+            'order': {},
+            'privateDataList': {},
+            'walletId': '',
+        }
+
+        return response
