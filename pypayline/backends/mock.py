@@ -180,7 +180,9 @@ class SoapMockBackend(object):
                     }
                 }
             ],
-            'order': {},
+            'order': {
+                'ref': '1',
+            },
             'privateDataList': {},
             'walletId': '',
         }

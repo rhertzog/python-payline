@@ -163,6 +163,7 @@ class PaylineClient(object):
         Get the status of a payment
         :param token: Th epayment token (returned by do_web_payment
         :return: tuple
+         - result_code = the API result code
          - is_transaction_ok = no fraud detected
          - order_ref: the order id,
          - amount: the paid amount,
@@ -209,13 +210,36 @@ class PaylineClient(object):
         Get the status of a payment
         :param contract_number: Contract number
         :param payment_record_id: record identifier, Received by IPN
-        :return: response dictionnary
+        :return: tuple
+         - result_code = the API result code
+         - is_transaction_ok = no fraud detected
+         - order_ref: the order id,
+         - amount: the paid amount,
+         - data: the raw data
         """
         data = self.backend.getPaymentRecord(
             contractNumber=contract_number,
             paymentRecordId=payment_record_id
         )
-        return data
+
+        try:
+            order_ref = data['order']['ref']
+        except KeyError:
+            order_ref = None
+
+        try:
+            amount = int(data['recurring']['amount'])
+            amount_int, amout_decimal = amount // 100, amount % 100
+            amount = Decimal('{0}.{1:02}'.format(amount_int, amout_decimal))
+        except KeyError:
+            amount = None
+
+        try:
+            result_code = data['result']['code']
+        except KeyError:
+            result_code = ""
+
+        return result_code, order_ref, amount, data
 
 
 if __name__ == '__main__':

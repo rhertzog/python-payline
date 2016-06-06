@@ -377,16 +377,20 @@ class SoapApiTestCase(unittest.TestCase):
         """check call API with recurring"""
         logger.setLevel(logging.DEBUG)
 
-        client = PaylineClient(
-            merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
-            homologation=True
-        )
+        if USE_MOCK:
+            client = PaylineClient(
+                merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
+                homologation=True
+            )
 
-        response = client.get_payment_record(
-            self.contract_number, '12345'
-        )
-        self.assertTrue(type(response) is dict)
+            result_code, order_ref, amount, data = client.get_payment_record(
+                self.contract_number, '12345'
+            )
 
+            self.assertTrue(result_code, '00000')
+            self.assertTrue(amount, Decimal(10))
+            self.assertTrue(order_ref, '1')
+            self.assertTrue(type(data) is dict)
 
 
 if __name__ == '__main__':
