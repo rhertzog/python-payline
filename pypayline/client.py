@@ -67,7 +67,7 @@ class PaylineClient(object):
 
     def do_web_payment(
             self, amount, currency, order_ref, return_url, cancel_url, recurring_times=None,
-            recurring_period_in_months=None, payline_action=100
+            recurring_period_in_months=None, payline_action=100, taxes=0, country='',
             ):
         """
         Calls the Payline SOAP API for making a new payment
@@ -96,6 +96,7 @@ class PaylineClient(object):
 
         # Check and convert params
         formatted_amount = int(amount * 100)
+        formatted_taxes = int(taxes * 100)
 
         formatted_currency = self.currencies.get(currency, None)
 
@@ -145,8 +146,9 @@ class PaylineClient(object):
                 'ref': order_ref,
                 'amount': formatted_amount,
                 'currency': formatted_currency,
-                'date': datetime.now().strftime('%d/%m/%Y %H:%M')
-
+                'date': datetime.now().strftime('%d/%m/%Y %H:%M'),
+                'taxes': formatted_taxes,
+                'country': country,
             },
             buyer={},
             owner={},
