@@ -174,16 +174,33 @@ class PaylineClient(object):
             token=token
         )
 
-        is_transaction_ok = not int(data['transaction']['isPossibleFraud'])
-        amount = int(data['payment']['amount'])
-        amount_int, amout_decimal = amount // 100, amount % 100
-        amount = Decimal('{0}.{1:02}'.format(amount_int, amout_decimal))
+        try:
+            is_transaction_ok = not int(data['transaction']['isPossibleFraud'])
+        except KeyError:
+            is_transaction_ok = None
 
-        currency_reverse = dict([(v, k) for (k, v) in self.currencies.items()])
-        currency = currency_reverse[int(data['payment']['currency'])]
+        try:
+            amount = int(data['payment']['amount'])
+            amount_int, amout_decimal = amount // 100, amount % 100
+            amount = Decimal('{0}.{1:02}'.format(amount_int, amout_decimal))
+        except KeyError:
+            amount = None
 
-        order_ref = data['order']['ref']
-        result_code = data['result']['code']
+        try:
+            currency_reverse = dict([(v, k) for (k, v) in self.currencies.items()])
+            currency = currency_reverse[int(data['payment']['currency'])]
+        except KeyError:
+            currency = None
+
+        try:
+            order_ref = data['order']['ref']
+        except KeyError:
+            order_ref = None
+
+        try:
+            result_code = data['result']['code']
+        except KeyError:
+            result_code = ""
 
         return result_code, is_transaction_ok, order_ref, amount, currency, data
 
