@@ -125,7 +125,8 @@ class SoapApiTestCase(unittest.TestCase):
         self.assertNotEqual(redirect_url, None)
 
         if USE_MOCK:
-            is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(token)
+            res_code, is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(token)
+            self.assertEqual(res_code, "00000")
             self.assertEqual(is_transaction_ok, True)
             self.assertEqual(amount, Decimal("12.50"))
             self.assertEqual(currency, u"EUR")
@@ -149,7 +150,8 @@ class SoapApiTestCase(unittest.TestCase):
         self.assertNotEqual(redirect_url, None)
 
         if USE_MOCK:
-            is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(token)
+            res_code, is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(token)
+            self.assertEqual(res_code, "00000")
             self.assertEqual(is_transaction_ok, True)
             self.assertEqual(amount, Decimal("12.50"))
             self.assertEqual(currency, u"USD")
@@ -190,7 +192,8 @@ class SoapApiTestCase(unittest.TestCase):
         self.assertNotEqual(redirect_url, None)
 
         if USE_MOCK:
-            is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(token)
+            res_code, is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(token)
+            self.assertEqual(res_code, '00000')
             self.assertEqual(is_transaction_ok, True)
             self.assertEqual(amount, Decimal("12.50"))
             self.assertEqual(currency, u"USD")
@@ -348,9 +351,8 @@ class SoapApiTestCase(unittest.TestCase):
         if USE_MOCK:
             client.backend.cancelled = True
 
-        self.assertRaises(
-            PaylineApiError, client.get_web_payment_details, token
-        )
+        returned_values = client.get_web_payment_details(token + "AAA")
+        self.assertNotEqual(returned_values[0], '00000')
 
     def test_call_api_wrong_token(self):
         """check call API in EUR get_web_payment_details should fail if wrong token"""
@@ -368,9 +370,8 @@ class SoapApiTestCase(unittest.TestCase):
         )
         self.assertNotEqual(redirect_url, None)
 
-        self.assertRaises(
-            PaylineApiError, client.get_web_payment_details, token + "AAA"
-        )
+        returned_values = client.get_web_payment_details(token + "AAA")
+        self.assertNotEqual(returned_values[0], '00000')
 
 
 if __name__ == '__main__':
