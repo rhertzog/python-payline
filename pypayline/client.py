@@ -68,7 +68,7 @@ class PaylineClient(object):
 
     def do_web_payment(
             self, amount, currency, order_ref, return_url, cancel_url, recurring_times=None,
-            recurring_period_in_months=None, payline_action=100, taxes=0, country='',
+            recurring_period_in_months=None, payline_action=100, taxes=0, country='', buyer=None
             ):
         """
         Calls the Payline SOAP API for making a new payment
@@ -83,7 +83,8 @@ class PaylineClient(object):
         :param payline_action: Payline code. Can be 100 (Autorisation) or 101 (Autorisation + validation)
             See Payline docs
         :param taxes: amount of taxes (for info)
-        :country: country (for info)
+        :param country: country (for info)
+        :param buyer: dictionnary with buyer info
         :return: Payline response as a dictionnary with the following keys
             - redirectURL : where to redirect the user
             - token = a token for the query
@@ -153,7 +154,7 @@ class PaylineClient(object):
                 'taxes': formatted_taxes,
                 'country': country,
             },
-            buyer={},
+            buyer=buyer or {},
             owner={},
             recurring=recurring,
             selectedContractList={},
