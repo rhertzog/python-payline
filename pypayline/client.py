@@ -67,7 +67,7 @@ class PaylineClient(object):
         self.backend.services[api_name]['ports'][api_name]['location'] = patched_location
 
     def do_web_payment(
-            self, amount, currency, order_ref, return_url, cancel_url, recurring_times=None,
+            self, amount, currency, order_ref, return_url, cancel_url, notification_url='', recurring_times=None,
             recurring_period_in_months=None, payline_action=100, taxes=0, country='', buyer=None
             ):
         """
@@ -78,6 +78,7 @@ class PaylineClient(object):
         :param order_ref: The order refernce (in your shopping system) corresponding to the payment
         :param return_url: The Url to go after payment
         :param cancel_url: The Url to go if user cancels the payment
+        :param notification_url: The Url to call for sending IPN
         :param recurring_times: number of payments
         :param recurring_period_in_months: Recurring period in months
         :param payline_action: Payline code. Can be 100 (Autorisation) or 101 (Autorisation + validation)
@@ -160,7 +161,8 @@ class PaylineClient(object):
             selectedContractList={},
             securityMode='SSL',
             returnURL=return_url,
-            cancelURL=cancel_url
+            cancelURL=cancel_url,
+            notificationURL=notification_url
         )
         return redirect_url, token
 
