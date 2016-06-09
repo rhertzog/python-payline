@@ -68,6 +68,7 @@ class SoapApiTestCase(unittest.TestCase):
     def test_wsdl(self):
         """check the wsdl is patched correctly"""
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -79,6 +80,7 @@ class SoapApiTestCase(unittest.TestCase):
     def test_wsdl_service(self):
         """check the service wsdl is patched correctly"""
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=False, cache=None
         )
@@ -91,6 +93,7 @@ class SoapApiTestCase(unittest.TestCase):
         """check the service wsdl is patched correctly"""
         merchant_id, access_key, contract_number = u"12345678901234", u"abCdeFgHiJKLmNoPqrst", u"1234567"
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True, cache=u"WebPaymentAPI"
         )
@@ -102,6 +105,7 @@ class SoapApiTestCase(unittest.TestCase):
     def test_header(self):
         """check the authorization header is filled"""
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -114,6 +118,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -139,6 +144,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -164,6 +170,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True, cache=u"WebPaymentAPI"
         )
@@ -180,6 +187,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -205,6 +213,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -219,6 +228,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -233,6 +243,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -248,6 +259,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = u''
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -263,6 +275,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -278,6 +291,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -293,6 +307,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number='',
             homologation=True, cache=False
         )
@@ -308,6 +323,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=u"1234", access_key=self.access_key, contract_number=self.contract_number,
             homologation=True, cache=False
         )
@@ -322,6 +338,7 @@ class SoapApiTestCase(unittest.TestCase):
         """Check error if Invalid access key"""
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=u"abcd", contract_number=self.contract_number,
             homologation=True, cache=False
         )
@@ -338,6 +355,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -360,6 +378,7 @@ class SoapApiTestCase(unittest.TestCase):
         dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
 
         client = PaylineClient(
+            api_name='WebPaymentAPI',
             merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
             homologation=True
         )
@@ -379,6 +398,7 @@ class SoapApiTestCase(unittest.TestCase):
 
         if USE_MOCK:
             client = PaylineClient(
+                api_name='DirectPaymentAPI',
                 merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
                 homologation=True
             )

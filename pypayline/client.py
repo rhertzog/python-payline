@@ -6,13 +6,12 @@ client class
 
 from __future__ import print_function
 
-
 import base64
 from datetime import datetime
 from decimal import Decimal
 
 from pypayline.backends.soap import SoapBackend
-from pypayline.exceptions import InvalidCurrencyError, PaylineApiError, PaylineAuthError, ArgumentsError
+from pypayline.exceptions import InvalidCurrencyError, ArgumentsError
 
 
 class PaylineClient(object):
@@ -25,15 +24,16 @@ class PaylineClient(object):
     }
 
     def __init__(
-            self, merchant_id, access_key, contract_number, cache='WebPaymentAPI', trace=False, homologation=False
+            self, api_name, merchant_id, access_key, contract_number, cache=True, trace=False, homologation=False
     ):
         """
         Init the SOAP by getting the WSDL of the service. It is recommeded to cache it
 
+        :param api_name : WSDL to get ('WebPaymentAPI' or 'DirectPaymentAPI')
         :param merchant_id : Your Payline Merchant id
         :param access_key : Your Payline access key
         :param contract number : Your Payline contract number
-        :param cache : Name of directory where to cache the WSDL file (recommended to do it). Cache is disabled if None
+        :param cache : cache the WSDL file (recommended to do it). Cache is disabled if None
         :param trace : print some debug logs
         :param homologation : if True use the homologation host for test. If false, user the regular host
         """
@@ -51,19 +51,20 @@ class PaylineClient(object):
         else:
             payline_host = u'https://services.payline.com'
 
-        wsdl_url = payline_host + u'/V4/services/WebPaymentAPI?wsdl'
+        wsdl_url = payline_host + u'/V4/services/{0}?wsdl'.format(api_name)
         # Create the webservice client
         self.backend = self.backend_class(
             wsdl=wsdl_url,
             http_headers=self.http_headers,
-            cache=cache,
-            trace=trace
+            cache=api_name if cache else None,
+            trace=trace,
+            api_name=api_name
         )
 
         # Patch location : The WSDL doesn't have the right location for the service
-        location = self.backend.services['WebPaymentAPI']['ports']['WebPaymentAPI']['location']
+        location = self.backend.services[api_name]['ports'][api_name]['location']
         patched_location = location.replace(u'http://host', payline_host)
-        self.backend.services['WebPaymentAPI']['ports']['WebPaymentAPI']['location'] = patched_location
+        self.backend.services[api_name]['ports'][api_name]['location'] = patched_location
 
     def do_web_payment(
             self, amount, currency, order_ref, return_url, cancel_url, recurring_times=None,
@@ -81,6 +82,8 @@ class PaylineClient(object):
         :param recurring_period_in_months: Recurring period in months
         :param payline_action: Payline code. Can be 100 (Autorisation) or 101 (Autorisation + validation)
             See Payline docs
+        :param taxes: amount of taxes (for info)
+        :country: country (for info)
         :return: Payline response as a dictionnary with the following keys
             - redirectURL : where to redirect the user
             - token = a token for the query
@@ -179,30 +182,30 @@ class PaylineClient(object):
 
         try:
             is_transaction_ok = not int(data['transaction']['isPossibleFraud'])
-        except KeyError:
+        except (KeyError, TypeError):
             is_transaction_ok = None
 
         try:
             amount = int(data['payment']['amount'])
             amount_int, amout_decimal = amount // 100, amount % 100
             amount = Decimal('{0}.{1:02}'.format(amount_int, amout_decimal))
-        except KeyError:
+        except (KeyError, TypeError):
             amount = None
 
         try:
             currency_reverse = dict([(v, k) for (k, v) in self.currencies.items()])
             currency = currency_reverse[int(data['payment']['currency'])]
-        except KeyError:
+        except (KeyError, TypeError):
             currency = None
 
         try:
             order_ref = data['order']['ref']
-        except KeyError:
+        except (KeyError, TypeError):
             order_ref = None
 
         try:
             result_code = data['result']['code']
-        except KeyError:
+        except (KeyError, TypeError):
             result_code = ""
 
         return result_code, is_transaction_ok, order_ref, amount, currency, data
@@ -226,92 +229,19 @@ class PaylineClient(object):
 
         try:
             order_ref = data['order']['ref']
-        except KeyError:
+        except (TypeError, KeyError):
             order_ref = None
 
         try:
             amount = int(data['recurring']['amount'])
             amount_int, amout_decimal = amount // 100, amount % 100
             amount = Decimal('{0}.{1:02}'.format(amount_int, amout_decimal))
-        except KeyError:
+        except (TypeError, KeyError):
             amount = None
 
         try:
             result_code = data['result']['code']
-        except KeyError:
+        except (TypeError, KeyError):
             result_code = ""
 
         return result_code, order_ref, amount, data
-
-
-if __name__ == '__main__':
-
-    def main_example():
-        dummy_order_ref = datetime.now().strftime('%Y%m%d%H%M')
-
-        try:
-            from payline_secrets import MERCHANT_ID, ACCESS_KEY, CONTRACT_NUMBER
-        except ImportError:
-            print(u"""
-                You must create a payline_secrets.py in your path and defines 3 globals
-                MERCHANT_ID = "1234567890"
-                ACCESS_KEY = "DJMESHXYou6LmjQFdH"
-                CONTRACT_NUMBER = "123456"
-            """)
-
-        merchant_id, access_key, contract_number = MERCHANT_ID, ACCESS_KEY, CONTRACT_NUMBER
-
-        try:
-            client = PaylineClient(
-                merchant_id=merchant_id, access_key=access_key, contract_number=contract_number, homologation=True,
-                #cache=None
-            )
-        except PaylineAuthError as err:
-            print("#AUTH ERR:", err)
-
-        try:
-            currency = u"EUR"
-            amount = raw_input(u'> Amount? (Prefix with $ to use this currency)')
-            if amount[0] == u'$':
-                amount = amount[1:]
-                currency = u"USD"
-            amount = Decimal(amount)
-        except ValueError:
-            print("Invalid value")
-            raise
-
-        recurring_times = None
-        recurring_in_months = None
-        recurring = raw_input(u'> Recurring in months? (Enter or 1, 3 or 6 months)')
-        if recurring.isdigit():
-            recurring = int(recurring)
-            if recurring in (1, 3, 6):
-                recurring_times = 12 // recurring
-                recurring_in_months = recurring
-
-        try:
-            redirect_url, token = client.do_web_payment(
-                amount=amount, currency=currency, order_ref=dummy_order_ref,
-                recurring_period_in_months=recurring_in_months, recurring_times=recurring_times,
-                return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
-            )
-            print("Redirect to", redirect_url)
-            print("Token", token)
-
-            try:
-                raw_input('Press Enter to get payment details')
-            except:
-                input('Press Enter to get payment details')
-
-            result_code, is_transaction_ok, order_ref, amount, currency, raw_data = client.get_web_payment_details(
-                token
-            )
-            print('> OK?', result_code, is_transaction_ok)
-            print('> Order', order_ref, ":", amount, currency)
-            print("********\n", raw_data, '\n*******')
-
-        except PaylineApiError as err:
-            print("#API ERR:", err)
-
-
-    main_example()

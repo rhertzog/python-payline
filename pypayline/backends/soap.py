@@ -24,6 +24,7 @@ class SoapBackend(object):
 
     def __init__(self, *args, **kwargs):
         """initialize the soap client and get wsdl file for service definition"""
+        kwargs.pop('api_name')
         self.soap_client = SoapClient(*args, **kwargs)
         self.services = self.soap_client.services
 

@@ -28,13 +28,13 @@ class SoapMockBackend(object):
         """
         self.http_headers = kwargs['http_headers']
         self.cancelled = False
-
+        self.api_name = kwargs.pop('api_name')
         # Only the required data
         self.services = {
-            u'WebPaymentAPI': {
+            self.api_name: {
                 u'ports': {
-                    u'WebPaymentAPI': {
-                        u'location': u'http://host/V4/services/WebPaymentAPI',
+                    self.api_name: {
+                        u'location': u'http://host/V4/services/{0}'.format(self.api_name),
                     }
                 }
             }
