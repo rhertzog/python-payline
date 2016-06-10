@@ -14,8 +14,8 @@ from pypayline.backends.soap import SoapBackend
 from pypayline.exceptions import InvalidCurrencyError, ArgumentsError
 
 
-class PaylineClient(object):
-    """Class for calling the payline services"""
+class PaylineBaseAPI(object):
+    """Base class for calling the payline services"""
     backend_class = SoapBackend
 
     currencies = {
@@ -24,7 +24,7 @@ class PaylineClient(object):
     }
 
     def __init__(
-            self, api_name, merchant_id, access_key, contract_number, cache=True, trace=False, homologation=False
+            self, api_name, merchant_id, access_key, contract_number, cache, trace, homologation
     ):
         """
         Init the SOAP by getting the WSDL of the service. It is recommeded to cache it
@@ -65,6 +65,28 @@ class PaylineClient(object):
         location = self.backend.services[api_name]['ports'][api_name]['location']
         patched_location = location.replace(u'http://host', payline_host)
         self.backend.services[api_name]['ports'][api_name]['location'] = patched_location
+
+
+class WebPaymentAPI(PaylineBaseAPI):
+    """client for Payline WebPayment API"""
+
+    def __init__(
+            self, merchant_id, access_key, contract_number, cache=True, trace=False, homologation=False
+    ):
+        """
+            Init the SOAP by getting the WSDL of the service. It is recommeded to cache it
+
+            :param merchant_id : Your Payline Merchant id
+            :param access_key : Your Payline access key
+            :param contract number : Your Payline contract number
+            :param cache : cache the WSDL file (recommended to do it). Cache is disabled if None
+            :param trace : print some debug logs
+            :param homologation : if True use the homologation host for test. If false, user the regular host
+        """
+        super(WebPaymentAPI, self).__init__(
+            'WebPaymentAPI', merchant_id, access_key, contract_number, cache=cache, trace=trace,
+            homologation=homologation
+        )
 
     def do_web_payment(
             self, amount, currency, order_ref, return_url, cancel_url, notification_url='', recurring_times=None,
@@ -212,6 +234,28 @@ class PaylineClient(object):
             result_code = ""
 
         return result_code, is_transaction_ok, order_ref, amount, currency, data
+
+
+class DirectPaymentAPI(PaylineBaseAPI):
+    """client for Payline DirectPayment API"""
+
+    def __init__(
+            self, merchant_id, access_key, contract_number, cache=True, trace=False, homologation=False
+    ):
+        """
+            Init the SOAP by getting the WSDL of the service. It is recommeded to cache it
+
+            :param merchant_id : Your Payline Merchant id
+            :param access_key : Your Payline access key
+            :param contract number : Your Payline contract number
+            :param cache : cache the WSDL file (recommended to do it). Cache is disabled if None
+            :param trace : print some debug logs
+            :param homologation : if True use the homologation host for test. If false, user the regular host
+        """
+        super(DirectPaymentAPI, self).__init__(
+            'DirectPaymentAPI', merchant_id, access_key, contract_number, cache=cache, trace=trace,
+            homologation=homologation
+        )
 
     def get_payment_record(self, contract_number, payment_record_id):
         """

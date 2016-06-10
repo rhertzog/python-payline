@@ -7,7 +7,7 @@ from datetime import datetime
 from decimal import Decimal
 import sys
 
-from pypayline.client import PaylineClient
+from pypayline.client import WebPaymentAPI, DirectPaymentAPI
 from pypayline.exceptions import PaylineApiError, PaylineAuthError
 
 
@@ -35,8 +35,7 @@ def web_payment_example():
     merchant_id, access_key, contract_number = MERCHANT_ID, ACCESS_KEY, CONTRACT_NUMBER
 
     try:
-        client = PaylineClient(
-            api_name='WebPaymentAPI',
+        client = WebPaymentAPI(
             merchant_id=merchant_id, access_key=access_key, contract_number=contract_number, homologation=True,
             # cache=None
         )
@@ -99,8 +98,7 @@ def direct_payment_example():
     merchant_id, access_key, contract_number = MERCHANT_ID, ACCESS_KEY, CONTRACT_NUMBER
 
     try:
-        client = PaylineClient(
-            api_name='DirectPaymentAPI',
+        client = DirectPaymentAPI(
             merchant_id=merchant_id, access_key=access_key, contract_number=contract_number, homologation=True,
             # cache=None
         )
