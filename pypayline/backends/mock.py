@@ -113,6 +113,8 @@ class SoapMockBackend(object):
             ret_code = '01001'  # Approved
         elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 2500:
             ret_code = '02500'    # Approved
+        elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 2501:
+            ret_code = '02501'  # Approved
         elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 12345:
             LAST_DATA['contractNumber'] = None
             LAST_DATA['last_payment'] = None
