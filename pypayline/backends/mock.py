@@ -104,13 +104,27 @@ class SoapMockBackend(object):
         if self.http_headers.get('Authorization', None) != u'Basic MTIzNDU2Nzg5MDEyMzQ6YWJDZGVGZ0hpSktMbU5vUHFyc3Q=':
             raise PaylineAuthError(u'Error while creating client. Err HTTP {0}'.format(401))
 
+        is_possible_fraud = False
+        if LAST_DATA['last_payment']["amount"] >= 1000000:
+            is_possible_fraud = True
+
+        ret_code = '00000'  # Approved
+        if LAST_DATA and LAST_DATA['last_payment']["amount"] == 1001:
+            ret_code = '01001'  # Approved
+        elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 2500:
+            ret_code = '02500'    # Approved
+        elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 12345:
+            LAST_DATA['contractNumber'] = None
+            LAST_DATA['last_payment'] = None
+            ret_code = '01100'  # Error
+
         # Minimalist response
         response = {
             'transaction': {
                 'id': '1234567890',
                 'date': datetime.now().strftime('%d/%m/%Y %H:%M'),
                 'isDuplicated': False,
-                'isPossibleFraud': LAST_DATA['last_payment']["amount"] >= 1000000,
+                'isPossibleFraud': is_possible_fraud,
                 'fraudResult': '',
                 'fraudResultDetails': '',
                 'explanation': '',
@@ -122,7 +136,7 @@ class SoapMockBackend(object):
             'payment': LAST_DATA.get('last_payment', None),
             'order': LAST_DATA.get('last_order', None),
             'result': {
-                'code': u'00000',
+                'code': ret_code,
                 'longMessage': u'Transaction approved',
                 'shortMessage': u'Transaction approved',
             }
