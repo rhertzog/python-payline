@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+
+export PYBUILD_NAME=payline
+
+%:
+	dh $@  --with python2,python3 --buildsystem=pybuild
+
+override_dh_auto_test:
+	PYBUILD_SYSTEM=custom \
+	PYBUILD_TEST_ARGS="cd {build_dir}; PYTHONPATH=. {interpreter} -m unittest discover -v" \
+	dh_auto_test
+		
