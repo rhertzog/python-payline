@@ -39,7 +39,7 @@ setup(
     maintainer_email='',
     url='',
     license='LGPL',
-    packages=['pypayline'],
+    packages=['pypayline', 'pypayline.backends'],
     platforms=["Linux", "Mac OS X", "Win"],
     install_requires=load_requirements(),
 )
