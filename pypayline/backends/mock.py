@@ -141,7 +141,27 @@ class SoapMockBackend(object):
                 'code': ret_code,
                 'longMessage': u'Transaction approved',
                 'shortMessage': u'Transaction approved',
-            }
+            },
+            'card': {
+                'type': u'CB',
+                'number': u'12345XXXXXXXX',
+                'expirationDate': u'1217'
+            },
+            'numberOfAttempt': u'1',
+            'privateDataList': None,
+            'media': u'Computer',
+            'extendedCard': {
+                'product': u'SUPERCARD CARD',
+                'network': u'SUPERCARD',
+                'country': u'FRA',
+                'isCvd': None,
+                'type': u'SUPERCARD',
+                'bank': u'1234 - THE BANK'
+            },
+            'authentication3DSecure': {
+                'md': None, 'xid': None, 'eci': None, 'cavvAlgorithm': None, 'cavv': None, 'vadsResult': None
+            },
+            'authorization': {'date': u'10/06/2016 10:21', 'number': u'AB12'}
         }
 
         if data['token'] != TOKEN:
