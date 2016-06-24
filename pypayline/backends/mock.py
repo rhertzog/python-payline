@@ -108,6 +108,7 @@ class SoapMockBackend(object):
         if LAST_DATA['last_payment']["amount"] >= 1000000:
             is_possible_fraud = True
 
+        card_country = u'FRA'
         ret_code = '00000'  # Approved
         if LAST_DATA and LAST_DATA['last_payment']["amount"] == 1001:
             ret_code = '01001'  # Approved
@@ -119,6 +120,8 @@ class SoapMockBackend(object):
             LAST_DATA['contractNumber'] = None
             LAST_DATA['last_payment'] = None
             ret_code = '01100'  # Error
+        elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 23456:
+            card_country = u'ZZZ'
 
         # Minimalist response
         response = {
@@ -153,7 +156,7 @@ class SoapMockBackend(object):
             'extendedCard': {
                 'product': u'SUPERCARD CARD',
                 'network': u'SUPERCARD',
-                'country': u'FRA',
+                'country': card_country,
                 'isCvd': None,
                 'type': u'SUPERCARD',
                 'bank': u'1234 - THE BANK'
