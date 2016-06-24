@@ -7,7 +7,10 @@ SOAP Backends : for real usage
 from __future__ import print_function
 
 import logging
-from urllib2 import HTTPError
+try:
+    from urllib2 import HTTPError
+except ImportError:
+    HTTPError = Exception
 
 from pysimplesoap.client import SoapClient, SoapFault
 

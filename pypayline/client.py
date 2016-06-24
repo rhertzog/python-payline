@@ -41,7 +41,14 @@ class PaylineBaseAPI(object):
         self.merchant_id, self.access_key, self.contract_number = merchant_id, access_key, contract_number
 
         # Create the header. last char of the base64 token is \n -> remove it
-        authorization_token = base64.encodestring(u'{0}:{1}'.format(self.merchant_id, self.access_key))[:-1]
+        try:
+            # Python 2
+            authorization_token = base64.encodestring(u'{0}:{1}'.format(self.merchant_id, self.access_key))[:-1]
+        except:
+            # Python 3
+            key = u'{0}:{1}'.format(self.merchant_id, self.access_key).encode('ascii')
+            authorization_token = base64.encodestring(key)[:-1]
+
         self.http_headers = {
             u'Authorization': u'Basic {0}'.format(authorization_token),
         }
@@ -54,7 +61,7 @@ class PaylineBaseAPI(object):
         wsdl_url = payline_host + u'/V4/services/{0}?wsdl'.format(api_name)
         # Create the webservice client
         self.backend = self.backend_class(
-            wsdl=wsdl_url,
+            wsdl=wsdl_url.encode('ascii'),
             http_headers=self.http_headers,
             cache=api_name if cache else None,
             trace=trace,
