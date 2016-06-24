@@ -19,6 +19,10 @@ LAST_DATA = {
 
 }
 
+LAST_PAYMENT_DATA = {
+
+}
+
 class SoapMockBackend(object):
     """Mock the SOAP API client"""
 
@@ -39,6 +43,7 @@ class SoapMockBackend(object):
                 }
             }
         }
+        self.doWebPaymentData = LAST_PAYMENT_DATA
 
     def get_response(self, error=None):
         if self.http_headers.get('Authorization', None) != u'Basic MTIzNDU2Nzg5MDEyMzQ6YWJDZGVGZ0hpSktMbU5vUHFyc3Q=':
@@ -90,6 +95,8 @@ class SoapMockBackend(object):
 
     def doWebPayment(self, **data):
         """call the doWebPayment SOAP API"""
+        LAST_PAYMENT_DATA.clear()
+        LAST_PAYMENT_DATA.update(**data)
         LAST_DATA.clear()
         response = self._handle_response(data)
         if response['result']['code'] == u'00000':
@@ -110,6 +117,9 @@ class SoapMockBackend(object):
 
         card_country = u'FRA'
         ret_code = '00000'  # Approved
+        transaction_id = '1234567890'
+        no_card_data = False
+
         if LAST_DATA and LAST_DATA['last_payment']["amount"] == 1001:
             ret_code = '01001'  # Approved
         elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 2500:
@@ -122,11 +132,18 @@ class SoapMockBackend(object):
             ret_code = '01100'  # Error
         elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 23456:
             card_country = u'ZZZ'
+        elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 23457:
+            # will cause error with Paypal mock
+            no_card_data = True
+        elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 23458:
+            # will cause error with Paypal mock
+            transaction_id = u"9876543210"
+            no_card_data = True
 
         # Minimalist response
         response = {
             'transaction': {
-                'id': '1234567890',
+                'id': transaction_id,
                 'date': datetime.now().strftime('%d/%m/%Y %H:%M'),
                 'isDuplicated': False,
                 'isPossibleFraud': is_possible_fraud,
@@ -166,6 +183,9 @@ class SoapMockBackend(object):
             },
             'authorization': {'date': u'10/06/2016 10:21', 'number': u'AB12'}
         }
+
+        if no_card_data:
+            response.pop('extendedCard')
 
         if data['token'] != TOKEN:
             response = self.get_response(u"This token does not exist")
