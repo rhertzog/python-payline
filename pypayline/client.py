@@ -9,6 +9,7 @@ from __future__ import print_function
 import base64
 from datetime import datetime
 from decimal import Decimal
+import six
 
 from pypayline.backends.soap import SoapBackend
 from pypayline.exceptions import InvalidCurrencyError, ArgumentsError
@@ -41,13 +42,12 @@ class PaylineBaseAPI(object):
         self.merchant_id, self.access_key, self.contract_number = merchant_id, access_key, contract_number
 
         # Create the header. last char of the base64 token is \n -> remove it
-        try:
-            # Python 2
-            authorization_token = base64.encodestring(u'{0}:{1}'.format(self.merchant_id, self.access_key))[:-1]
-        except:
-            # Python 3
-            key = u'{0}:{1}'.format(self.merchant_id, self.access_key).encode('ascii')
+        key = u'{0}:{1}'.format(self.merchant_id, self.access_key)
+        if six.PY2:
             authorization_token = base64.encodestring(key)[:-1]
+        else:
+            authorization_token = base64.encodebytes(key.encode('ascii')
+                                                     )[:-1].decode('ascii')
 
         self.http_headers = {
             u'Authorization': u'Basic {0}'.format(authorization_token),
