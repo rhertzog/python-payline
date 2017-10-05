@@ -18,6 +18,7 @@ from pypayline.exceptions import InvalidCurrencyError, ArgumentsError
 class PaylineBaseAPI(object):
     """Base class for calling the payline services"""
     backend_class = SoapBackend
+    web_service_version = "3"
 
     currencies = {
         u'EUR': 978,
@@ -167,7 +168,7 @@ class WebPaymentAPI(PaylineBaseAPI):
             }
 
         redirect_url, token = self.backend.doWebPayment(
-            version="3",
+            version=self.web_service_version,
             payment={
                 'amount': formatted_amount,
                 'currency': formatted_currency,
@@ -208,7 +209,7 @@ class WebPaymentAPI(PaylineBaseAPI):
          - data: the raw data
         """
         data = self.backend.getWebPaymentDetails(
-            version="3",
+            version=self.web_service_version,
             token=token
         )
 
