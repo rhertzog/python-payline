@@ -119,6 +119,7 @@ class SoapMockBackend(object):
         ret_code = '00000'  # Approved
         transaction_id = '1234567890'
         no_card_data = False
+        paypal_data = ''
 
         if LAST_DATA and LAST_DATA['last_payment']["amount"] == 1001:
             ret_code = '01001'  # Approved
@@ -133,8 +134,13 @@ class SoapMockBackend(object):
         elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 23456:
             card_country = u'ZZZ'
         elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 23457:
-            # will cause error with Paypal mock
+            # will fallback to analyze partner data
             no_card_data = True
+            paypal_data = '''{
+                "login": "paypal_customer@example.com",
+                "accountCountryCode": "BE",
+                "referenceID": "%s"
+            }''' % transaction_id
         elif LAST_DATA and LAST_DATA['last_payment']["amount"] == 23458:
             # will cause error with Paypal mock
             transaction_id = u"9876543210"
@@ -153,7 +159,8 @@ class SoapMockBackend(object):
                 'score': 0,
                 'threeDSecure': 'N',
                 'externalWalletType': 'Me',
-                'externalWalletCont ractNumber': '',
+                'externalWalletContractNumber': '',
+                'partnerAdditionalData': paypal_data,
             },
             'payment': LAST_DATA.get('last_payment', None),
             'order': LAST_DATA.get('last_order', None),
