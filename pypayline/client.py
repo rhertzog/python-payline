@@ -97,9 +97,12 @@ class WebPaymentAPI(PaylineBaseAPI):
         )
 
     def do_web_payment(
-            self, amount, currency, order_ref, return_url, cancel_url, notification_url='', recurring_times=None,
+            self, amount, currency, order_ref, return_url, cancel_url,
+            selected_contract_list=None,
+            second_selected_contract_list=None,
+            notification_url='', recurring_times=None,
             recurring_period_in_months=None, payline_action=100, taxes=0, country='', buyer=None
-            ):
+        ):
         """
         Calls the Payline SOAP API for making a new payment
 
@@ -167,6 +170,9 @@ class WebPaymentAPI(PaylineBaseAPI):
                 'billingCycle': recurring_period,
             }
 
+        if selected_contract_list is None:
+            selected_contract_list = [ {'selectedContract': c} for c in self.contract_number.split(",") ]
+
         redirect_url, token = self.backend.doWebPayment(
             version=self.web_service_version,
             payment={
@@ -174,7 +180,7 @@ class WebPaymentAPI(PaylineBaseAPI):
                 'currency': formatted_currency,
                 'action': payline_action,
                 'mode': payment_mode,
-                'contractNumber': self.contract_number,
+                'contractNumber': self.contract_number.split(",")[0],
                 # 'deferredActionDate': 'dd/mm/yy',
             },
             order={
@@ -188,7 +194,8 @@ class WebPaymentAPI(PaylineBaseAPI):
             buyer=buyer or {},
             owner={},
             recurring=recurring,
-            selectedContractList={},
+            selectedContractList=selected_contract_list,
+            secondSelectedContractList=second_selected_contract_list,
             securityMode='SSL',
             returnURL=return_url,
             cancelURL=cancel_url,
