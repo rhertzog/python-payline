@@ -7,8 +7,10 @@ client class
 from __future__ import print_function
 
 import base64
+import os
 from datetime import datetime
 from decimal import Decimal
+
 import six
 
 from pypayline.backends.soap import SoapBackend
@@ -19,19 +21,18 @@ class PaylineBaseAPI(object):
     """Base class for calling the payline services"""
     backend_class = SoapBackend
     web_service_version = "19"
+    api_name = 'PaylineBaseAPI'
 
     currencies = {
         u'EUR': 978,
         u'USD': 840,
     }
 
-    def __init__(
-            self, api_name, merchant_id, access_key, contract_number, cache, trace, homologation
-    ):
+    def __init__(self, merchant_id=None, access_key=None, contract_number=None,
+                 cache=None, trace=None, homologation=False):
         """
         Init the SOAP by getting the WSDL of the service. It is recommeded to cache it
 
-        :param api_name : WSDL to get ('WebPaymentAPI' or 'DirectPaymentAPI')
         :param merchant_id : Your Payline Merchant id
         :param access_key : Your Payline access key
         :param contract number : Your Payline contract number
@@ -41,7 +42,11 @@ class PaylineBaseAPI(object):
         """
 
         self.merchant_id, self.access_key, self.contract_number = merchant_id, access_key, contract_number
+        self.sandbox = homologation
+        self.cache = cache
+        self.trace = trace
 
+    def setup_backend(self):
         # Create the header. last char of the base64 token is \n -> remove it
         key = u'{0}:{1}'.format(self.merchant_id, self.access_key)
         if six.PY2:
@@ -54,33 +59,40 @@ class PaylineBaseAPI(object):
             u'Authorization': u'Basic {0}'.format(authorization_token),
         }
 
-        if homologation:
+        # Create the webservice client
+        # Note that the location attribute is required as the WSDL embeds
+        # an invalid location URL. And we use that to differentiate between
+        # sandbox/production.
+        self.backend = self.backend_class(
+            wsdl=self.soap_wsdl_url.encode('ascii'),
+            location=self.soap_url.encode('ascii'),  # Requir
+            http_headers=self.http_headers,
+            cache=self.api_name if self.cache else None,
+            trace=self.trace,
+            api_name=self.api_name
+        )
+
+    @property
+    def soap_url(self):
+        if self.sandbox:
             payline_host = u'https://homologation.payline.com'
         else:
             payline_host = u'https://services.payline.com'
+        return  '{}/V4/services/{}'.format(payline_host, self.api_name)
 
-        wsdl_url = payline_host + u'/V4/services/{0}?wsdl'.format(api_name)
-        # Create the webservice client
-        self.backend = self.backend_class(
-            wsdl=wsdl_url.encode('ascii'),
-            http_headers=self.http_headers,
-            cache=api_name if cache else None,
-            trace=trace,
-            api_name=api_name
+    @property
+    def soap_wsdl_url(self):
+        return 'file://{}/{}.wsdl'.format(
+            os.path.abspath(os.path.dirname(__file__)),
+            self.api_name
         )
-
-        # Patch location : The WSDL doesn't have the right location for the service
-        location = self.backend.services[api_name]['ports'][api_name]['location']
-        patched_location = location.replace(u'http://host', payline_host)
-        self.backend.services[api_name]['ports'][api_name]['location'] = patched_location
 
 
 class WebPaymentAPI(PaylineBaseAPI):
     """client for Payline WebPayment API"""
+    api_name = 'WebPaymentAPI'
 
-    def __init__(
-            self, merchant_id, access_key, contract_number, cache=True, trace=False, homologation=False
-    ):
+    def __init__(self, *args, **kwargs):
         """
             Init the SOAP by getting the WSDL of the service. It is recommeded to cache it
 
@@ -91,15 +103,16 @@ class WebPaymentAPI(PaylineBaseAPI):
             :param trace : print some debug logs
             :param homologation : if True use the homologation host for test. If false, user the regular host
         """
-        super(WebPaymentAPI, self).__init__(
-            'WebPaymentAPI', merchant_id, access_key, contract_number, cache=cache, trace=trace,
-            homologation=homologation
-        )
+        super(WebPaymentAPI, self).__init__(*args, **kwargs)
+        self.setup_backend()
 
     def do_web_payment(
-            self, amount, currency, order_ref, return_url, cancel_url, notification_url='', recurring_times=None,
+            self, amount, currency, order_ref, return_url, cancel_url,
+            selected_contract_list=None,
+            second_selected_contract_list=None,
+            notification_url='', recurring_times=None,
             recurring_period_in_months=None, payline_action=100, taxes=0, country='', buyer=None
-            ):
+        ):
         """
         Calls the Payline SOAP API for making a new payment
 
@@ -140,7 +153,7 @@ class WebPaymentAPI(PaylineBaseAPI):
 
         if recurring_times is None:
             payment_mode = u'CPT'
-            recurring = {}
+            recurring = None
         else:
             payment_mode = u'NX'
             recurring_amount = formatted_amount // recurring_times
@@ -167,6 +180,13 @@ class WebPaymentAPI(PaylineBaseAPI):
                 'billingCycle': recurring_period,
             }
 
+        if selected_contract_list is None:
+            selected_contract_list = [{ 'selectedContract': c }
+                                      for c in self.contract_number.split(",")]
+        else:
+            selected_contract_list = [{ 'selectedContract': c }
+                                      for c in selected_contract_list]
+
         redirect_url, token = self.backend.doWebPayment(
             version=self.web_service_version,
             payment={
@@ -174,7 +194,7 @@ class WebPaymentAPI(PaylineBaseAPI):
                 'currency': formatted_currency,
                 'action': payline_action,
                 'mode': payment_mode,
-                'contractNumber': self.contract_number,
+                'contractNumber': self.contract_number.split(",")[0],
                 # 'deferredActionDate': 'dd/mm/yy',
             },
             order={
@@ -188,7 +208,7 @@ class WebPaymentAPI(PaylineBaseAPI):
             buyer=buyer or {},
             owner={},
             recurring=recurring,
-            selectedContractList={},
+            selectedContractList=selected_contract_list,
             securityMode='SSL',
             returnURL=return_url,
             cancelURL=cancel_url,
@@ -246,10 +266,9 @@ class WebPaymentAPI(PaylineBaseAPI):
 
 class DirectPaymentAPI(PaylineBaseAPI):
     """client for Payline DirectPayment API"""
+    api_name = 'DirectPaymentAPI'
 
-    def __init__(
-            self, merchant_id, access_key, contract_number, cache=True, trace=False, homologation=False
-    ):
+    def __init__(self, *args, **kwargs):
         """
             Init the SOAP by getting the WSDL of the service. It is recommeded to cache it
 
@@ -260,10 +279,8 @@ class DirectPaymentAPI(PaylineBaseAPI):
             :param trace : print some debug logs
             :param homologation : if True use the homologation host for test. If false, user the regular host
         """
-        super(DirectPaymentAPI, self).__init__(
-            'DirectPaymentAPI', merchant_id, access_key, contract_number, cache=cache, trace=trace,
-            homologation=homologation
-        )
+        super(DirectPaymentAPI, self).__init__(*args, **kwargs)
+        self.setup_backend()
 
     def get_payment_record(self, contract_number, payment_record_id):
         """

@@ -70,39 +70,6 @@ class SoapApiTestCase(unittest.TestCase):
         """clean"""
         self.merchant_id, self.access_key, self.contract_number = u"12345678901234", u"abCdeFgHiJKLmNoPqrst", u"1234567"
 
-    def test_wsdl(self):
-        """check the wsdl is patched correctly"""
-        client = WebPaymentAPI(
-            merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
-            homologation=True
-        )
-        location = u'https://homologation.payline.com'
-        self.assertTrue(
-            client.backend.services['WebPaymentAPI']['ports']['WebPaymentAPI']['location'].find(location) == 0
-        )
-
-    def test_wsdl_service(self):
-        """check the service wsdl is patched correctly"""
-        client = WebPaymentAPI(
-            merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
-            homologation=False, cache=None
-        )
-        location = u'https://services.payline.com'
-        self.assertTrue(
-            client.backend.services['WebPaymentAPI']['ports']['WebPaymentAPI']['location'].find(location) == 0
-        )
-
-    def test_wsdl_cache(self):
-        """check the service wsdl is patched correctly"""
-        merchant_id, access_key, contract_number = u"12345678901234", u"abCdeFgHiJKLmNoPqrst", u"1234567"
-        client = WebPaymentAPI(
-            merchant_id=self.merchant_id, access_key=self.access_key, contract_number=self.contract_number,
-            homologation=True, cache=u"WebPaymentAPI"
-        )
-        location = u'https://homologation.payline.com'
-        self.assertTrue(
-            client.backend.services['WebPaymentAPI']['ports']['WebPaymentAPI']['location'].find(location) == 0
-        )
 
     def test_header(self):
         """check the authorization header is filled"""
