@@ -2,7 +2,7 @@ python-payline (0.3.0-1) unstable; urgency=medium
 
   * New upstream release using version 19 by default.
 
- -- Raphaël Hertzog <hertzog@debian.org>  Mon, 16 Jul 2018 15:22:46 +0200
+ -- Raphaël Hertzog <hertzog@debian.org>  Mon, 14 Jan 2019 16:30:56 +0100
 
 python-payline (0.2.1-1) unstable; urgency=medium
 
