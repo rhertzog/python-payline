@@ -70,6 +70,13 @@ class SoapApiTestCase(unittest.TestCase):
         """clean"""
         self.merchant_id, self.access_key, self.contract_number = u"12345678901234", u"abCdeFgHiJKLmNoPqrst", u"1234567"
 
+    @staticmethod
+    def get_buyer():
+        return {
+            'lastName': 'Doe',
+            'firstName': 'John',
+            'email': 'john.doe@apidev.fr',
+        }
 
     def test_header(self):
         """check the authorization header is filled"""
@@ -90,10 +97,14 @@ class SoapApiTestCase(unittest.TestCase):
             homologation=True
         )
 
-        redirect_url, token = client.do_web_payment(
-            amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref,
-            return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
-        )
+        try:
+            redirect_url, token = client.do_web_payment(
+                amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref, country="FR",
+                return_url='https://apidev.fr/success/', cancel_url='https://apidev.fr/cancel/',
+                notification_url='https://apidev.fr/notify/', buyer=self.get_buyer()
+            )
+        except Exception as err:
+            self.assertEqual(err, '')
         self.assertNotEqual(redirect_url, None)
 
         if USE_MOCK:
@@ -117,7 +128,8 @@ class SoapApiTestCase(unittest.TestCase):
 
         redirect_url, token = client.do_web_payment(
             amount=Decimal("12.50"), currency=u"USD", order_ref=dummy_order_ref,
-            return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
+            return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/',
+            buyer=self.get_buyer()
         )
         self.assertNotEqual(redirect_url, None)
 
@@ -142,7 +154,8 @@ class SoapApiTestCase(unittest.TestCase):
 
         redirect_url, token = client.do_web_payment(
             amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref,
-            return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
+            return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/',
+            buyer=self.get_buyer()
         )
         self.assertNotEqual(redirect_url, None)
 
@@ -158,7 +171,7 @@ class SoapApiTestCase(unittest.TestCase):
 
         redirect_url, token = client.do_web_payment(
             amount=Decimal("12.50"), currency=u"USD", order_ref=dummy_order_ref,
-            recurring_period_in_months=3, recurring_times=4,
+            recurring_period_in_months=3, recurring_times=4, buyer=self.get_buyer(),
             return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
         )
         self.assertNotEqual(redirect_url, None)
@@ -182,7 +195,7 @@ class SoapApiTestCase(unittest.TestCase):
         )
 
         self.assertRaises(PaylineApiError, client.do_web_payment,
-            amount=Decimal("0.00"), currency=u"EUR", order_ref=dummy_order_ref,
+            amount=Decimal("0.00"), currency=u"EUR", order_ref=dummy_order_ref, buyer=self.get_buyer(),
             return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
         )
 
@@ -196,7 +209,7 @@ class SoapApiTestCase(unittest.TestCase):
         )
 
         self.assertRaises(PaylineApiError, client.do_web_payment,
-            amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref,
+            amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref, buyer=self.get_buyer(),
             return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
         )
 
@@ -226,7 +239,7 @@ class SoapApiTestCase(unittest.TestCase):
 
         self.assertRaises(
             PaylineApiError, client.do_web_payment,
-            amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref,
+            amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref, buyer=self.get_buyer(),
             return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
         )
 
@@ -241,7 +254,7 @@ class SoapApiTestCase(unittest.TestCase):
 
         self.assertRaises(
             PaylineApiError, client.do_web_payment,
-            amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref,
+            amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref, buyer=self.get_buyer(),
             return_url='', cancel_url='http://freexian.com/cancel/'
         )
 
@@ -256,7 +269,7 @@ class SoapApiTestCase(unittest.TestCase):
 
         self.assertRaises(
             PaylineApiError, client.do_web_payment,
-            amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref,
+            amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref, buyer=self.get_buyer(),
             return_url='http://freexian.com/success/', cancel_url='/cancel/'
         )
 
@@ -271,7 +284,7 @@ class SoapApiTestCase(unittest.TestCase):
 
         self.assertRaises(
             PaylineApiError, client.do_web_payment,
-            amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref,
+            amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref, buyer=self.get_buyer(),
             return_url='http://freexian.com/success/', cancel_url='/cancel/'
         )
 
@@ -287,7 +300,7 @@ class SoapApiTestCase(unittest.TestCase):
         self.assertRaises(
             PaylineAuthError, client.do_web_payment,
             amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref,
-            return_url='http://freexian.com/success/', cancel_url='/cancel/'
+            return_url='http://freexian.com/success/', cancel_url='/cancel/', buyer=self.get_buyer()
         )
 
     def test_invalid_access_key(self):
@@ -301,7 +314,7 @@ class SoapApiTestCase(unittest.TestCase):
         self.assertRaises(
             PaylineAuthError, client.do_web_payment,
             amount=Decimal("-10.00"), currency=u"EUR", order_ref=dummy_order_ref,
-            return_url='http://freexian.com/success/', cancel_url='/cancel/'
+            return_url='http://freexian.com/success/', cancel_url='/cancel/', buyer=self.get_buyer()
         )
 
     def test_call_api_eur_not_visited(self):
@@ -315,7 +328,7 @@ class SoapApiTestCase(unittest.TestCase):
         )
 
         redirect_url, token = client.do_web_payment(
-            amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref,
+            amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref, buyer=self.get_buyer(),
             return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
         )
         self.assertNotEqual(redirect_url, None)
@@ -337,7 +350,7 @@ class SoapApiTestCase(unittest.TestCase):
         )
 
         redirect_url, token = client.do_web_payment(
-            amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref,
+            amount=Decimal("12.50"), currency=u"EUR", order_ref=dummy_order_ref, buyer=self.get_buyer(),
             return_url='http://freexian.com/success/', cancel_url='http://freexian.com/cancel/'
         )
         self.assertNotEqual(redirect_url, None)
