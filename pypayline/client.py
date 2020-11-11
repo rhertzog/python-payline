@@ -20,6 +20,8 @@ from pypayline.exceptions import InvalidCurrencyError, ArgumentsError
 class PaylineBaseAPI(object):
     """Base class for calling the payline services"""
     backend_class = SoapBackend
+    backend = None
+    http_headers = {}
     web_service_version = "26"
     api_name = 'PaylineBaseAPI'
 
@@ -46,8 +48,7 @@ class PaylineBaseAPI(object):
         self.cache = cache
         self.trace = trace
 
-    def setup_backend(self):
-        # Create the header. last char of the base64 token is \n -> remove it
+    def get_auth_token(self):
         key = u'{0}:{1}'.format(self.merchant_id, self.access_key)
         if six.PY2:
             authorization_token = base64.encodestring(key)[:-1]
@@ -55,9 +56,13 @@ class PaylineBaseAPI(object):
             authorization_token = base64.encodebytes(
                 key.encode('ascii')
             )[:-1].decode('ascii')
+        return authorization_token
+
+    def setup_backend(self):
+        # Create the header. last char of the base64 token is \n -> remove it
 
         self.http_headers = {
-            u'Authorization': u'Basic {0}'.format(authorization_token),
+            u'Authorization': u'Basic {0}'.format(self.get_auth_token()),
         }
 
         # Create the webservice client
