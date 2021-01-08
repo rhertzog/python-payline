@@ -108,8 +108,8 @@ class SoapMockBackend(object):
 
     def getWebPaymentDetails(self, **data):
         """call the getWebPaymentDetails SOAP API"""
-        if self.http_headers.get('Authorization', None) != u'Basic MTIzNDU2Nzg5MDEyMzQ6YWJDZGVGZ0hpSktMbU5vUHFyc3Q=':
-            raise PaylineAuthError(u'Error while creating client. Err HTTP {0}'.format(401))
+        # if self.http_headers.get('Authorization', None) != u'Basic MTIzNDU2Nzg5MDEyMzQ6YWJDZGVGZ0hpSktMbU5vUHFyc3Q=':
+        #     raise PaylineAuthError(u'Error while creating client. Err HTTP {0}'.format(401))
 
         is_possible_fraud = False
         if LAST_DATA['last_payment']["amount"] >= 1000000:
