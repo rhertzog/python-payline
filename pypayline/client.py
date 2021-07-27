@@ -164,7 +164,7 @@ class WebPaymentAPI(PaylineBaseAPI):
             recurring_amount = formatted_amount // recurring_times
             first_amount = recurring_amount + (formatted_amount - recurring_times * recurring_amount)
             if recurring_period_in_months is None:
-                raise ArgumentsError(u'The recurring_period_in_months argument should be set with interger values')
+                raise ArgumentsError(u'The recurring_period_in_months argument should be set with integer values')
 
             recurring_periods_map = {
                 1: 40,  # Monthly
@@ -174,7 +174,7 @@ class WebPaymentAPI(PaylineBaseAPI):
             try:
                 recurring_period = recurring_periods_map[int(recurring_period_in_months)]
             except ValueError:
-                raise ArgumentsError(u'The recurring_period_in_months argument should be an interger value')
+                raise ArgumentsError(u'The recurring_period_in_months argument should be an integer value')
             except KeyError:
                 raise ArgumentsError(u'The recurring_period_in_months argument should be in 1, 3 or 6 months')
 
