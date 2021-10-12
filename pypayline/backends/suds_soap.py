@@ -39,7 +39,7 @@ class SoapBackend(object):
                 raise PaylineApiError(response['result']['longMessage'])
             return response['redirectURL'], response['token']
         except APIError as err:
-            raise PaylineApiError('Error: {0}: {1} -> {2}'.format(err, data, response))
+            raise PaylineApiError('Error: {0}'.format(err))
 
     def getWebPaymentDetails(self, **data):
         """call the getWebPaymentDetails SOAP API"""
