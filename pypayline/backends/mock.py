@@ -19,20 +19,20 @@ LAST_DATA = {
 
 }
 
-LAST_PAYMENT_DATA = {
+LAST_PAYMENT_DATA = {}
 
-}
 
 class SoapMockBackend(object):
     """Mock the SOAP API client"""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, access_key="abCdeFgHiJKLmNoPqrst", *args, **kwargs):
         """
         Use dummy merchant_id = = u"12345678901234" and access_key = u"abCdeFgHiJKLmNoPqrst" in order to use this mock
         """
         self.http_headers = kwargs['http_headers']
         self.cancelled = False
         self.api_name = kwargs.pop('api_name')
+        self.access_key = access_key
         # Only the required data
         self.services = {
             self.api_name: {
@@ -46,8 +46,8 @@ class SoapMockBackend(object):
         self.doWebPaymentData = LAST_PAYMENT_DATA
 
     def get_response(self, error=None):
-        if self.http_headers.get('Authorization', None) != u'Basic MTIzNDU2Nzg5MDEyMzQ6YWJDZGVGZ0hpSktMbU5vUHFyc3Q=':
-            raise PaylineAuthError(u'Error while creating client. Err HTTP {0}'.format(401))
+        # if self.http_headers.get('Authorization', None) != u'Basic MTIzNDU2Nzg5MDEyMzQ6YWJDZGVGZ0hpSktMbU5vUHFyc3Q=':
+        #     raise PaylineAuthError(u'Error while creating client. Err HTTP {0}'.format(401))
 
         if error:
             return {
@@ -108,8 +108,8 @@ class SoapMockBackend(object):
 
     def getWebPaymentDetails(self, **data):
         """call the getWebPaymentDetails SOAP API"""
-        if self.http_headers.get('Authorization', None) != u'Basic MTIzNDU2Nzg5MDEyMzQ6YWJDZGVGZ0hpSktMbU5vUHFyc3Q=':
-            raise PaylineAuthError(u'Error while creating client. Err HTTP {0}'.format(401))
+        # if self.http_headers.get('Authorization', None) != u'Basic MTIzNDU2Nzg5MDEyMzQ6YWJDZGVGZ0hpSktMbU5vUHFyc3Q=':
+        #     raise PaylineAuthError(u'Error while creating client. Err HTTP {0}'.format(401))
 
         is_possible_fraud = False
         if LAST_DATA['last_payment']["amount"] >= 1000000:

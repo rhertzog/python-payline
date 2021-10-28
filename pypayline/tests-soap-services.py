@@ -18,9 +18,10 @@ from pypayline.exceptions import InvalidCurrencyError, PaylineApiError, PaylineA
 logger = logging.getLogger('pypayline')
 logger.addHandler(logging.StreamHandler())
 
-logger_pysimplesoap = logging.getLogger('pysimplesoap')
+logger_pysimplesoap = logging.getLogger('suds')
 logger_pysimplesoap.addHandler(logging.StreamHandler())
 logger_pysimplesoap.setLevel(logging.DEBUG)
+
 
 class PaylineBaseAPITestCase(unittest.TestCase):
 

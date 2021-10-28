@@ -10,14 +10,12 @@ class InvalidCurrencyError(Exception):
     pass
 
 
-class PaylineAuthError(Exception):
-    """This exception is raised when connection to Payline SOAP API raises an error"""
-    pass
-
-
 class PaylineApiError(Exception):
     """This exception is raised when Payline SOAP API raises an error"""
     pass
+
+
+PaylineAuthError = PaylineApiError
 
 
 class ArgumentsError(Exception):

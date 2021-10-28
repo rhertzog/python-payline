@@ -24,7 +24,7 @@
 						<element name="privateDataList" nillable="true" type="tns1:privateDataList"/>
 						<element name="languageCode" nillable="true" type="xsd:string"/>
 						<element name="customPaymentPageCode" nillable="true" type="xsd:string"/>
-						<element minOccurs="0" name="buyer" nillable="true" type="tns1:buyer"/>
+						<element minOccurs="0" name="buyer" type="tns1:buyer"/>
 						<element name="owner" nillable="true" type="tns1:owner"/>
 						<element name="securityMode" nillable="true" type="xsd:string"/>
 						<element name="recurring" nillable="true" type="tns1:recurring"/>
@@ -34,6 +34,8 @@
 						<element name="subMerchant" nillable="true" type="tns1:subMerchant"/>
 						<element name="miscData" nillable="true" type="xsd:string"/>
 						<element name="asynchronousRetryTimeout" nillable="true" type="xsd:string"/>
+                        <element name="threeDSInfo" nillable="true" type="tns1:threeDSInfo"/>
+                        <element name="merchantScore" nillable="true" type="xsd:string"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -48,8 +50,8 @@
 					</annotation>
 					<sequence>
 						<element name="result" nillable="false" type="tns1:result"/>
-						<element name="token" nillable="false" type="xsd:string"/>
-						<element name="redirectURL" nillable="false" type="xsd:string"/>
+						<element name="token" nillable="true" type="xsd:string"/>
+						<element name="redirectURL" nillable="true" type="xsd:string"/>
 						<element minOccurs="0" name="stepCode" nillable="true" type="xsd:string"/>
 						<element minOccurs="0" name="reqCode" nillable="true" type="xsd:string"/>
 						<element minOccurs="0" name="method" nillable="true" type="xsd:string"/>
@@ -101,6 +103,7 @@
 						<element name="bankAccountData" nillable="true" type="tns1:bankAccountData"/>
 						<element name="subMerchant" nillable="true" type="tns1:subMerchant"/>
 						<element name="buyer" nillable="true" type="tns1:buyer"/>
+						<element name="linkedTransactionId" nillable="true" type="xsd:string"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -114,6 +117,7 @@
 						</documentation>
 					</annotation>
 					<sequence>
+						<element name="transient" nillable="true" type="xsd:string"/>
 						<element name="version" nillable="false" type="xsd:string"/>
 						<element name="payment" nillable="false" type="tns1:payment"/>
 						<element name="bankAccountData" nillable="false" type="tns1:bankAccountData"/>
@@ -126,6 +130,8 @@
 						<element name="media" nillable="true" type="xsd:string"/>
 						<element name="subMerchant" nillable="true" type="tns1:subMerchant"/>
 						<element name="asynchronousRetryTimeout" nillable="true" type="xsd:string"/>
+						<element name="linkedTransactionId" nillable="true" type="xsd:string"/>
+						<element name="recurring" nillable="true" type="tns1:recurring"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -138,6 +144,7 @@
 						</documentation>
 					</annotation>
 					<sequence>
+						<element name="transient" nillable="true" type="xsd:string"/>
 						<element name="result" nillable="false" type="tns1:result"/>
 						<element name="transaction" nillable="false" type="tns1:transaction"/>
 						<element name="authorization" nillable="false" type="tns1:authorization"/>
@@ -145,7 +152,9 @@
 						<element name="extendedCard" type="tns1:extendedCardType"/>
 						<element name="privateDataList" nillable="true" type="tns1:privateDataList"/>
 						<element name="contractNumber" nillable="false" type="xsd:string"/>
-											</sequence>
+						<element name="linkedTransactionId" nillable="true" type="xsd:string"/>
+						<element name="resultContainer" nillable="true" type="xsd:string"/>
+					</sequence>
 				</complexType>
 			</element>
 			<element name="doCaptureRequest">
@@ -256,6 +265,10 @@
 						<element name="transactionID" nillable="false" type="xsd:string"/>
 						<element name="comment" nillable="true" type="xsd:string"/>
 						<element name="media" nillable="true" type="xsd:string"/>
+						<element name="amount" nillable="true" type="xsd:string"/>
+						<element name="currency" nillable="true" type="xsd:string"/>
+						<element minOccurs="0" name="privateDataList" nillable="true" type="tns1:privateDataList"/>
+						<element name="sequenceNumber" nillable="true" type="xsd:string"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -311,133 +324,7 @@
 					</sequence>
 				</complexType>
 			</element>
-			<element name="doMassCaptureRequest">
-				<complexType>
-					<annotation>
-						<documentation>
-							This element is the request for the
-							doMassCapture
-							method
-						</documentation>
-					</annotation>
-					<sequence>
-						<element name="version" nillable="false" type="xsd:string"/>
-						<element name="captureAuthorizationList" nillable="true" type="tns1:captureAuthorizationList"/>
-						<element name="comment" nillable="true" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="doMassCaptureResponse">
-				<complexType>
-					<annotation>
-						<documentation>
-							This element is the reponse from the
-							doMassCapture
-							method
-						</documentation>
-					</annotation>
-					<sequence>
-						<element name="result" nillable="false" type="tns1:result"/>
-						<element name="massTraitmentID" nillable="false" type="xsd:string"/>
-						<element name="date" nillable="false" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="doMassRefundRequest">
-				<complexType>
-					<annotation>
-						<documentation>
-							This element is the request for the
-							doMassRefund
-							method
-						</documentation>
-					</annotation>
-					<sequence>
-						<element name="version" nillable="false" type="xsd:string"/>
-						<element name="refundAuthorizationList" nillable="true" type="tns1:refundAuthorizationList"/>
-						<element name="comment" nillable="true" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="doMassRefundResponse">
-				<complexType>
-					<annotation>
-						<documentation>
-							This element is the reponse from the
-							doMassRefund
-							method
-						</documentation>
-					</annotation>
-					<sequence>
-						<element name="result" nillable="false" type="tns1:result"/>
-						<element name="massTraitmentID" nillable="false" type="xsd:string"/>
-						<element name="date" nillable="false" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="doMassResetRequest">
-				<complexType>
-					<annotation>
-						<documentation>
-							This element is the request for the
-							doMassRefund
-							method
-						</documentation>
-					</annotation>
-					<sequence>
-						<element name="version" nillable="false" type="xsd:string"/>
-						<element name="resetAuthorizationList" nillable="true" type="tns1:resetAuthorizationList"/>
-						<element name="comment" nillable="true" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="doMassResetResponse">
-				<complexType>
-					<annotation>
-						<documentation>
-							This element is the reponse from the
-							doMassReset
-							method
-						</documentation>
-					</annotation>
-					<sequence>
-						<element name="result" nillable="false" type="tns1:result"/>
-						<element name="massTraitmentID" nillable="false" type="xsd:string"/>
-						<element name="date" nillable="false" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="getMassTraitmentDetailsRequest">
-				<complexType>
-					<annotation>
-						<documentation>
-							This element is the request for the
-							getMassTraitmentDetails method
-						</documentation>
-					</annotation>
-					<sequence>
-						<element name="version" nillable="false" type="xsd:string"/>
-						<element name="massTraitmentID" nillable="false" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="getMassTraitmentDetailsResponse">
-				<complexType>
-					<annotation>
-						<documentation>
-							This element is the reponse from the
-							getMassTraitmentDetails method
-						</documentation>
-					</annotation>
-					<sequence>
-						<element name="result" nillable="false" type="tns1:result"/>
-						<element name="massTraitementID" nillable="false" type="xsd:string"/>
-						<element name="totalLinesNumber" nillable="true" type="xsd:string"/>
-						<element name="failedLinesNumber" nillable="true" type="xsd:string"/>
-						<element name="failedListObject" nillable="true" type="tns1:failedListObject"/>
-					</sequence>
-				</complexType>
-			</element>
+
 			<element name="createWalletRequest">
 				<complexType>
 					<annotation>
@@ -457,6 +344,7 @@
 						<element name="authentication3DSecure" nillable="true" type="tns1:authentication3DSecure"/>
 						<element name="media" nillable="true" type="xsd:string"/>
 						<element name="contractNumberWalletList" nillable="true" type="tns1:contractNumberWalletList"/>
+						<element name="transactionID" nillable="true" type="xsd:string"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -498,6 +386,7 @@
 						<element name="authentication3DSecure" nillable="true" type="tns1:authentication3DSecure"/>
 						<element name="media" nillable="true" type="xsd:string"/>
 						<element name="contractNumberWalletList" nillable="true" type="tns1:contractNumberWalletList"/>
+						<element name="transactionID" nillable="true" type="xsd:string"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -666,10 +555,12 @@
 						<element name="walletId" nillable="false" type="xsd:string"/>
 						<element name="cardInd" nillable="true" type="xsd:string"/>
 						<element name="cvx" nillable="true" type="xsd:string"/>
+						<element minOccurs="0" name="recurring" nillable="true" type="tns1:recurring"/>
 						<element name="privateDataList" nillable="true" type="tns1:privateDataList"/>
 						<element name="media" nillable="true" type="xsd:string"/>
 						<element name="authentication3DSecure" nillable="true" type="tns1:authentication3DSecure"/>
 						<element name="subMerchant" nillable="true" type="tns1:subMerchant"/>
+						<element name="linkedTransactionId" nillable="true" type="xsd:string"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -685,6 +576,8 @@
 						<element name="result" nillable="false" type="tns1:result"/>
 						<element name="transaction" nillable="true" type="tns1:transaction"/>
 						<element name="authorization" nillable="true" type="tns1:authorization"/>
+						<element name="authentication3DSecure" nillable="true" type="tns1:authentication3DSecure"/>
+						<element name="linkedTransactionId" nillable="true" type="xsd:string"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -705,9 +598,12 @@
 						<element name="walletId" nillable="false" type="xsd:string"/>
 						<element name="cardInd" nillable="true" type="xsd:string"/>
 						<element name="order" nillable="true" type="tns1:order"/>
+						<element minOccurs="0" name="recurring" nillable="true" type="tns1:recurring"/>
+						<element minOccurs="0" name="authentication3DSecure" nillable="true" type="tns1:authentication3DSecure"/>
 						<element name="privateDataList" nillable="true" type="tns1:privateDataList"/>
 						<element name="media" nillable="true" type="xsd:string"/>
 						<element name="subMerchant" nillable="true" type="tns1:subMerchant"/>
+						<element name="linkedTransactionId" nillable="true" type="xsd:string"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -851,6 +747,7 @@
 						<element name="customPaymentTemplateURL" nillable="true" type="xsd:string"/>
 						<element name="contractNumberWalletList" nillable="true" type="tns1:contractNumberWalletList"/>
 						<element name="merchantName" nillable="true" type="xsd:string"/>
+                        <element name="threeDSInfo" nillable="true" type="tns1:threeDSInfo"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -993,6 +890,51 @@
 					</sequence>
 				</complexType>
 			</element>
+			<element name="doAuthorizationRedirectRequest">
+				<complexType>
+					<annotation>
+						<documentation>
+							This element is the request for the
+							doAuthorizationRedirect
+							method
+						</documentation>
+					</annotation>
+					<sequence>
+						<element name="version" nillable="false" type="xsd:string"/>
+						<element name="payment" nillable="false" type="tns1:payment"/>
+						<element name="card" nillable="false" type="tns1:card"/>
+						<element name="returnURL" nillable="false" type="xsd:string"/>
+						<element name="cancelURL" nillable="false" type="xsd:string"/>
+						<element name="order" nillable="false" type="tns1:order"/>
+						<element name="notificationURL" nillable="true" type="xsd:string"/>
+						<element name="privateDataList" nillable="true" type="tns1:privateDataList"/>
+						<element name="languageCode" nillable="true" type="xsd:string"/>
+						<element minOccurs="0" name="buyer" nillable="true" type="tns1:buyer"/>
+						<element name="owner" nillable="true" type="tns1:owner"/>
+						<element name="securityMode" nillable="true" type="xsd:string"/>
+						<element name="recurring" nillable="true" type="tns1:recurring"/>
+						<element name="merchantName" nillable="true" type="xsd:string"/>
+						<element name="subMerchant" nillable="true" type="tns1:subMerchant"/>
+						<element name="miscData" nillable="true" type="xsd:string"/>
+						<element name="asynchronousRetryTimeout" nillable="true" type="xsd:string"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="doAuthorizationRedirectResponse">
+				<complexType>
+					<annotation>
+						<documentation>
+							This element is the reponse from the
+							doAuthorizationRedirect
+							method
+						</documentation>
+					</annotation>
+					<sequence>
+						<element name="result" nillable="false" type="tns1:result"/>
+						<element name="redirectURL" nillable="false" type="xsd:string"/>
+					</sequence>
+				</complexType>
+			</element>
 			<element name="getTransactionDetailsRequest">
 				<complexType>
 					<annotation>
@@ -1033,10 +975,15 @@
 						<element name="associatedTransactionsList" nillable="true" type="tns1:associatedTransactionsList"/>
 						<element name="statusHistoryList" nillable="true" type="tns1:statusHistoryList"/>
 						<element name="media" nillable="true" type="xsd:string"/>
+						<element name="customerMedia" nillable="false" type="tns1:media"/>
 						<element name="contractNumber" nillable="false" type="xsd:string"/>
 						<element minOccurs="0" name="paymentAdditionalList" nillable="true" type="tns1:paymentAdditionalList"/>
 						<element name="bankAccountData" nillable="true" type="tns1:bankAccountData"/>
 						<element name="subMerchant" nillable="true" type="tns1:subMerchant"/>
+						<element minOccurs="0" name="authentication3DSecure" nillable="true" type="tns1:authentication3DSecure"/>
+						<element name="pointOfSell" nillable="false" type="tns1:pointOfSell"/>
+						<element name="routingRule" nillable="false" type="tns1:routingRule"/>
+						<element name="linkedTransactionId" nillable="true" type="xsd:string"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -1052,8 +999,8 @@
 						<element name="version" nillable="false" type="xsd:string"/>
 						<element name="transactionId" nillable="true" type="xsd:string"/>
 						<element name="orderRef" nillable="true" type="xsd:string"/>
-						<element name="startDate" nillable="true" type="xsd:string"/>
-						<element name="endDate" nillable="true" type="xsd:string"/>
+						<element name="startDate" type="xsd:string"/>
+						<element name="endDate" type="xsd:string"/>
 						<element name="contractNumber" nillable="true" type="xsd:string"/>
 						<element name="authorizationNumber" nillable="true" type="xsd:string"/>
 						<element name="returnCode" nillable="true" type="xsd:string"/>
@@ -1069,6 +1016,10 @@
 						<element name="walletId" nillable="true" type="xsd:string"/>
 						<element name="sequenceNumber" nillable="true" type="xsd:string"/>
 						<element name="token" nillable="true" type="xsd:string"/>
+						<element name="pointOfSellId" nillable="true" type="xsd:string"/>
+						<element name="cardNetwork" nillable="true" type="xsd:string"/>
+						<element name="threeDSecured" nillable="true" type="xsd:string"/>
+						<element name="customerMediaId" nillable="true" type="xsd:string"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -1095,6 +1046,7 @@
 						</documentation>
 					</annotation>
 					<sequence>
+						<element name="transient" nillable="true" type="xsd:string"/>
 						<element name="version" nillable="false" type="xsd:string"/>
 						<element name="card" nillable="false" type="tns1:card"/>
 						<element name="payment" nillable="false" type="tns1:payment"/>
@@ -1106,6 +1058,13 @@
 						<element minOccurs="0" name="generateVirtualCvx" nillable="true" type="xsd:string"/>
 						<element name="merchantName" nillable="true" type="xsd:string"/>
 						<element name="returnURL" nillable="true" type="xsd:string"/>
+                        <element name="order" nillable="true" type="tns1:order"/>
+                        <element minOccurs="0" name="buyer" nillable="true" type="tns1:buyer"/>
+                        <element minOccurs="0" name="subMerchant" nillable="true" type="tns1:subMerchant"/>
+                        <element name="recurring" nillable="true" type="tns1:recurring"/>
+                        <element name="threeDSInfo" nillable="true" type="tns1:threeDSInfo"/>
+                        <element name="merchantScore" nillable="true" type="xsd:string"/>
+						<element name="privateDataList" nillable="true" type="tns1:privateDataList"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -1118,6 +1077,7 @@
 						</documentation>
 					</annotation>
 					<sequence>
+						<element name="transient" nillable="true" type="xsd:string"/>
 						<element name="result" nillable="false" type="tns1:result"/>
 						<element name="actionUrl" nillable="true" type="xsd:string"/>
 						<element name="actionMethod" nillable="true" type="xsd:string"/>
@@ -1131,6 +1091,7 @@
 						<element name="authentication3DSecure" nillable="true" type="tns1:authentication3DSecure"/>
 						<element minOccurs="0" name="virtualCvx" nillable="true" type="xsd:string"/>
 						<element minOccurs="0" name="token" nillable="true" type="xsd:string"/>
+						<element name="privateDataList" nillable="true" type="tns1:privateDataList"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -1143,11 +1104,13 @@
 						</documentation>
 					</annotation>
 					<sequence>
+						<element name="transient" nillable="true" type="xsd:string"/>
 						<element name="version" nillable="false" type="xsd:string"/>
 						<element name="contractNumber" nillable="false" type="xsd:string"/>
 						<element name="pares" nillable="false" type="xsd:string"/>
 						<element name="md" nillable="true" type="xsd:string"/>
-						<element name="card" nillable="false" type="tns1:card"/>
+						<element name="card" nillable="true" type="tns1:card"/>
+						<element name="privateDataList" nillable="true" type="tns1:privateDataList"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -1160,9 +1123,11 @@
 						</documentation>
 					</annotation>
 					<sequence>
+						<element name="transient" nillable="true" type="xsd:string"/>
 						<element name="result" nillable="false" type="tns1:result"/>
 						<element name="authentication3DSecure" nillable="true" type="tns1:authentication3DSecure"/>
 						<element name="mpiResult" nillable="true" type="xsd:string"/>
+						<element name="privateDataList" nillable="true" type="tns1:privateDataList"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -1301,6 +1266,9 @@
 							getEncryptionKeyRequest method
 						</documentation>
 					</annotation>
+                    <sequence>
+                        <element name="version" nillable="true" type="xsd:string"/>
+                    </sequence>
 				</complexType>
 			</element>
 			<element name="getEncryptionKeyResponse">
@@ -1427,9 +1395,9 @@
 			</element>
 			<element name="getAlertDetailsRequest">
 				<complexType>
-					<sequence>				
+					<sequence>
 						<element maxOccurs="1" minOccurs="1" name="version" nillable="true" type="xsd:string">
-						</element>					
+						</element>
 						<element maxOccurs="1" minOccurs="1" name="AlertId" nillable="false" type="xsd:string">
 						</element>
 						<element maxOccurs="1" minOccurs="1" name="TransactionId" nillable="false" type="xsd:string">
@@ -1524,11 +1492,11 @@
 			<element name="unBlockResponse">
 				<complexType>
 					<sequence>
-					<element name="result" nillable="false" type="tns1:result"/>
+						<element name="result" nillable="false" type="tns1:result"/>
 					</sequence>
 				</complexType>
 			</element>
-			
+
 			<element name="updatePaymentRecordRequest">
 				<complexType>
 					<sequence>
@@ -1552,7 +1520,7 @@
 					</sequence>
 				</complexType>
 			</element>
-			
+
 			<element name="getBillingRecordRequest">
 				<complexType>
 					<sequence>
@@ -1576,7 +1544,7 @@
 					</sequence>
 				</complexType>
 			</element>
-			
+
 			<element name="updateBillingRecordRequest">
 				<complexType>
 					<sequence>
@@ -1587,7 +1555,7 @@
 					</sequence>
 				</complexType>
 			</element>
-			
+
 			<element name="updateBillingRecordResponse">
 				<complexType>
 					<sequence>
@@ -1602,7 +1570,7 @@
 					</sequence>
 				</complexType>
 			</element>
-			
+
 			<element name="doBankTransferRequest">
 				<complexType>
 					<annotation>
@@ -1618,6 +1586,7 @@
 						<element name="comment" nillable="true" type="xsd:string"/>
 						<element name="transactionID" nillable="true" type="xsd:string"/>
 						<element name="orderID" nillable="false" type="xsd:string"/>
+						<element name="privateDataList" nillable="true" type="tns1:privateDataList"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -1632,6 +1601,7 @@
 					<sequence>
 						<element name="result" nillable="false" type="tns1:result"/>
 						<element name="transaction" nillable="false" type="tns1:transaction"/>
+						<element name="privateDataList" nillable="true" type="tns1:privateDataList"/>
 					</sequence>
 				</complexType>
 			</element>
@@ -1669,7 +1639,7 @@
 					</sequence>
 				</complexType>
 			</element>
-			
+
 		</schema>
     <schema elementFormDefault="qualified" targetNamespace="http://obj.ws.payline.experian.com" xmlns="http://www.w3.org/2001/XMLSchema">
 			<complexType name="result">
@@ -1694,6 +1664,7 @@
 					<element minOccurs="0" name="expirationDate" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="cardholder" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="token" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="panType" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 
@@ -1708,7 +1679,7 @@
 				</sequence>
 			</complexType>
 
-		<complexType name="order">
+			<complexType name="order">
 				<annotation>
 					<documentation>
 						This element contains information about the
@@ -1729,6 +1700,13 @@
 					<element minOccurs="0" name="deliveryExpectedDate" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="deliveryExpectedDelay" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="deliveryCharge" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="discountAmount" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="otaPackageType" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="otaDestinationCountry" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="bookingReference" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="orderDetail" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="orderExtended" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="orderOTA" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 			<complexType name="key">
@@ -1743,7 +1721,11 @@
 					<element name="modulus" nillable="false" type="xsd:string"/>
 					<element name="publicExponent" nillable="false" type="xsd:string"/>
 					<element name="expirationDate" nillable="false" type="xsd:string"/>
-				</sequence>
+                    <element name="cipher" nillable="true" type="xsd:string"/>
+                    <element name="algo" nillable="true" type="xsd:string"/>
+                    <element name="size" nillable="true" type="xsd:integer"/>
+
+                </sequence>
 			</complexType>
 			<complexType name="details">
 				<annotation>
@@ -1775,6 +1757,8 @@
 					<element minOccurs="0" name="subcategory2" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="additionalData" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="taxRate" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="seller" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="sellerType" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 			<complexType name="privateData">
@@ -1808,10 +1792,33 @@
 					<element minOccurs="0" name="threeDSecure" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="softDescriptor" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="score" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="scoring" nillable="true" type="tns1:scoring"/>
 					<element minOccurs="0" name="externalWalletType" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="externalWalletContractNumber" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="partnerAdditionalData" nillable="true" type="xsd:string"/>
-					<element name="avs" nillable="true" type="tns1:avs"/>
+					<element minOccurs="0" name="avs" nillable="true" type="tns1:avs"/>
+					<element minOccurs="0" name="customerId" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="type" nillable="false" type="xsd:string"/>
+					<element minOccurs="0" name="orderReference" nillable="true" type="xsd:string"/>
+                    <element minOccurs="0" name="payment" nillable="true" type="tns1:payment"/>
+                    <element minOccurs="0" name="pointOfSell" nillable="true" type="tns1:pointOfSell"/>
+					<element minOccurs="0" name="card" nillable="true" type="tns1:cardOut"/>
+					<element minOccurs="0" name="extendedCard" nillable="true" type="tns1:extendedCardType"/>
+				</sequence>
+			</complexType>
+			<complexType name="scoring">
+				<annotation>
+					<documentation>
+						This element contains information about the
+						scoring
+					</documentation>
+				</annotation>
+				<sequence>
+					<element minOccurs="0" name="partnerId" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="orderId" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="value" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="response" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="errorMessage" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 			<complexType name="fraudResultDetails">
@@ -1840,12 +1847,13 @@
 					<element name="currency" nillable="false" type="xsd:string"/>
 					<element name="action" nillable="false" type="xsd:string"/>
 					<element name="mode" nillable="false" type="xsd:string"/>
-					<element name="contractNumber" nillable="false" type="xsd:string"/>
+					<element minOccurs="0" name="contractNumber" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="differedActionDate" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="method" nillable="true" type="xsd:string"/>
-					<element name="softDescriptor" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="softDescriptor" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="cardBrand" nillable="true" type="string"/>
 					<element minOccurs="0" name="registrationToken" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="cumulatedAmount" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 			<complexType name="authorization">
@@ -1858,6 +1866,8 @@
 				<sequence>
 					<element name="number" nillable="false" type="xsd:string"/>
 					<element name="date" nillable="false" type="xsd:string"/>
+					<element name="authorizedAmount" nillable="true" type="xsd:string"/>
+					<element name="authorizedCurrency" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 			<complexType name="paymentData">
@@ -1890,7 +1900,7 @@
 					<element minOccurs="0" name="cardPresent" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="cardholder" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="token" nillable="true" type="xsd:string"/>
-					<element minOccurs="0" name="paymentData" nillable="true" type="tns1:paymentData"/>
+					<element minOccurs="0" name="paymentData" nillable="false" type="tns1:paymentData"/>
 				</sequence>
 			</complexType>
 			<complexType name="buyer">
@@ -1929,7 +1939,9 @@
 					<element name="isEmulator" nillable="true" type="xsd:string"/>
 					<element name="isRooted" nillable="true" type="xsd:string"/>
 					<element name="hasTimezoneMismatch" nillable="true" type="xsd:string"/>
-								
+					<element name="loyaltyMemberType" nillable="true" type="xsd:string"/>
+					<element name="buyerExtended" nillable="true" type="xsd:string"/>
+                    <element name="merchantAuthentication" nillable="true" type="tns1:merchantAuthentication"/>
 				</sequence>
 			</complexType>
 			<complexType name="owner">
@@ -1960,6 +1972,7 @@
 					<element minOccurs="0" name="lastName" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="street1" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="street2" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="streetNumber" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="cityName" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="zipCode" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="country" nillable="true" type="xsd:string"/>
@@ -1967,6 +1980,8 @@
 					<element minOccurs="0" name="state" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="county" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="phoneType" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="addressCreateDate" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="email" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 			<complexType name="addressOwner">
@@ -2030,18 +2045,18 @@
 			</complexType>
 
 			<complexType name="avs">
-			<annotation>
-				<documentation>
-					This element contains the result of the address verification service
-				</documentation>
-			</annotation>
-			<sequence>
-				<element name="result" nillable="false" type="xsd:string"/>
-				<element name="resultFromAcquirer" nillable="false" type="xsd:string"/>
-			</sequence>
-		</complexType>
+				<annotation>
+					<documentation>
+						This element contains the result of the address verification service
+					</documentation>
+				</annotation>
+				<sequence>
+					<element name="result" nillable="false" type="xsd:string"/>
+					<element name="resultFromAcquirer" nillable="false" type="xsd:string"/>
+				</sequence>
+			</complexType>
 
-					<complexType name="contractNumberWalletList">
+			<complexType name="contractNumberWalletList">
 				<annotation>
 					<documentation>
 						An array of contract number of a wallet
@@ -2129,6 +2144,7 @@
 					<element name="endDate" nillable="true" type="xsd:string"/>
 					<element name="newAmount" nillable="true" type="xsd:string"/>
 					<element name="amountModificationDate" nillable="true" type="xsd:string"/>
+					<element name="billingRank" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 			<complexType name="recurringForUpdate">
@@ -2174,7 +2190,7 @@
 					<element maxOccurs="100" minOccurs="0" name="billingRecord" type="tns1:billingRecord"/>
 				</sequence>
 			</complexType>
-			
+
 			<complexType name="billingRecordForUpdate">
 				<annotation>
 					<documentation>
@@ -2189,7 +2205,7 @@
 					<element name="executionDate" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
-			
+
 			<complexType name="wallet">
 				<annotation>
 					<documentation>
@@ -2268,6 +2284,8 @@
 					<element minOccurs="0" name="typeSecurisation" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="PaResStatus" nillable="true" type="xsd:string"/>
 					<element minOccurs="0" name="VeResStatus" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="resultContainer" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="authenticationResult" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 			<complexType name="connectionData">
@@ -2496,6 +2514,7 @@
 					</documentation>
 				</annotation>
 				<sequence>
+					<element minOccurs="0" name="id" nillable="true" type="xsd:string"/>
 					<element name="siret" nillable="true" type="xsd:string"/>
 					<element name="codeMcc" nillable="true">
 						<annotation>
@@ -2538,6 +2557,7 @@
 							</sequence>
 						</complexType>
 					</element>
+					<element minOccurs="0" name="reference" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 			<complexType name="virtualTerminal">
@@ -2646,6 +2666,7 @@
 					<element name="amount" nillable="false" type="xsd:string"/>
 					<element name="status" nillable="false" type="xsd:string"/>
 					<element name="originTransactionId" nillable="false" type="xsd:string"/>
+					<element minOccurs="0" name="currency" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 
@@ -2675,6 +2696,10 @@
 					<element name="fees" nillable="false" type="xsd:string"/>
 					<element name="status" nillable="false" type="xsd:string"/>
 					<element name="originTransactionId" nillable="false" type="xsd:string"/>
+					<element minOccurs="0" name="amountValue" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="amountCurrency" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="feesValue" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="feesCurrency" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
 
@@ -2688,22 +2713,22 @@
 					<element maxOccurs="100" minOccurs="0" name="statusHistory" type="tns1:statusHistory"/>
 				</sequence>
 			</complexType>
-<complexType name="paymentAdditional">
-	<annotation>
-		<documentation>
-			This element contains information about the
-			paymentAdditional
-		</documentation>
-	</annotation>
-	<sequence>
-		<element name="transaction" nillable="false" type="tns1:transaction"/>
-		<element name="payment" nillable="false" type="tns1:payment"/>
-		<element name="authorization" nillable="false" type="tns1:authorization"/>
-		<element minOccurs="0" name="authentication3DSecure" nillable="true" type="tns1:authentication3DSecure"/>
-		<element minOccurs="0" name="card" nillable="true" type="tns1:cardOut"/>
-		<element minOccurs="0" name="extendedCard" nillable="true" type="tns1:extendedCardType"/>
-	</sequence>
-</complexType>
+			<complexType name="paymentAdditional">
+				<annotation>
+					<documentation>
+						This element contains information about the
+						paymentAdditional
+					</documentation>
+				</annotation>
+				<sequence>
+					<element name="transaction" nillable="false" type="tns1:transaction"/>
+					<element name="payment" nillable="false" type="tns1:payment"/>
+					<element name="authorization" nillable="false" type="tns1:authorization"/>
+					<element minOccurs="0" name="authentication3DSecure" nillable="true" type="tns1:authentication3DSecure"/>
+					<element minOccurs="0" name="card" nillable="true" type="tns1:cardOut"/>
+					<element minOccurs="0" name="extendedCard" nillable="true" type="tns1:extendedCardType"/>
+				</sequence>
+			</complexType>
 
 			<complexType name="paymentAdditionalList">
 				<annotation>
@@ -2843,6 +2868,95 @@
 					<element name="subMerchantPhoneNumber" nillable="true" type="xsd:string"/>
 				</sequence>
 			</complexType>
+			<complexType name="media">
+				<annotation>
+					<documentation>
+						This element contains information about the customer media
+					</documentation>
+				</annotation>
+				<sequence>
+					<element name="id" nillable="false" type="xsd:string" wsdl:required="true"/>
+					<element minOccurs="1" name="label" nillable="false" type="xsd:string"/>
+					<element minOccurs="1" name="operatingSystem" nillable="false" type="xsd:string"/>
+					<element minOccurs="1" name="browser" nillable="false" type="xsd:string"/>
+					<element minOccurs="1" name="userAgent" nillable="false" type="xsd:string"/>
+				</sequence>
+			</complexType>
+			<complexType name="routingRule">
+				<annotation>
+					<documentation>
+						This element contains information about a routingRule associated with a Payment Facilitator
+					</documentation>
+				</annotation>
+				<sequence>
+					<element minOccurs="0" name="id" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="sourceContractNumber" nillable="true" type="xsd:string"/>
+					<element minOccurs="0" name="targetContractNumber" nillable="true" type="xsd:string"/>
+				</sequence>
+			</complexType>
+            <complexType name="threeDSInfo">
+                <annotation>
+                    <documentation>
+                        This element contains information about 3DS.
+                    </documentation>
+                </annotation>
+                <sequence>
+                    <element name="challengeInd" nillable="true" type="xsd:string"/>
+                    <element name="threeDSReqPriorAuthData" nillable="true" type="xsd:string"/>
+                    <element name="threeDSReqPriorAuthMethod" nillable="true" type="xsd:string"/>
+                    <element name="threeDSReqPriorAuthTimestamp" nillable="true" type="xsd:string"/>
+                    <element name="browser" nillable="true" type="tns1:browser"/>
+                    <element name="sdk" nillable="true" type="tns1:sdk"/>
+                    <element name="threeDSMethodNotificationURL" nillable="true" type="xsd:string"/>
+                    <element name="threeDSMethodResult" nillable="true" type="xsd:string"/>
+                    <element name="challengeWindowSize" nillable="true" type="xsd:string"/>
+                </sequence>
+            </complexType>
+            <complexType name="browser">
+                <annotation>
+                    <documentation>
+                        This element contains information about Browser.
+                    </documentation>
+                </annotation>
+                <sequence>
+                    <element name="acceptHeader" nillable="true" type="xsd:string"/>
+                    <element name="javaEnabled" nillable="true" type="xsd:string"/>
+                    <element name="javascriptEnabled" nillable="true" type="xsd:string"/>
+                    <element name="language" nillable="true" type="xsd:string"/>
+                    <element name="colorDepth" nillable="true" type="xsd:string"/>
+                    <element name="screenHeight" nillable="true" type="xsd:string"/>
+                    <element name="screenWidth" nillable="true" type="xsd:string"/>
+                    <element name="timeZoneOffset" nillable="true" type="xsd:string"/>
+                    <element name="userAgent" nillable="true" type="xsd:string"/>
+                </sequence>
+            </complexType>
+            <complexType name="sdk">
+                <annotation>
+                    <documentation>
+                        This element contains information about SDK.
+                    </documentation>
+                </annotation>
+                <sequence>
+                    <element name="deviceRenderingOptionsIF" nillable="true" type="xsd:string"/>
+                    <element name="deviceRenderOptionsUI" nillable="true" type="xsd:string"/>
+                    <element name="appID" nillable="true" type="xsd:string"/>
+                    <element name="ephemPubKey" nillable="true" type="xsd:string"/>
+                    <element name="maxTimeout" nillable="true" type="xsd:integer"/>
+                    <element name="referenceNumber" nillable="true" type="xsd:string"/>
+                    <element name="transID" nillable="true" type="xsd:string"/>
+                </sequence>
+            </complexType>
+            <complexType name="merchantAuthentication">
+            <annotation>
+                <documentation>
+                    This element contains information about SDK.
+                </documentation>
+            </annotation>
+            <sequence>
+            <element name="method" nillable="true" type="xsd:string"/>
+            <element name="date" nillable="true" type="xsd:string"/>
+            </sequence>
+            </complexType>
 		</schema>
   </wsdl:types>
   <wsdl:message name="getTransactionDetailsRequest">
@@ -2855,6 +2969,10 @@
   </wsdl:message>
   <wsdl:message name="doDebitRequest">
     <wsdl:part name="parameters" element="impl:doDebitRequest">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doAuthorizationRedirectResponse">
+    <wsdl:part name="parameters" element="impl:doAuthorizationRedirectResponse">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="doScheduledWalletPaymentResponse">
@@ -2921,16 +3039,16 @@
     <wsdl:part name="parameters" element="impl:doRefundRequest">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="doMassResetRequest">
-    <wsdl:part name="parameters" element="impl:doMassResetRequest">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="getWebWalletResponse">
     <wsdl:part name="parameters" element="impl:getWebWalletResponse">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getAlertDetailsRequest">
     <wsdl:part name="parameters" element="impl:getAlertDetailsRequest">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doAuthorizationRedirectRequest">
+    <wsdl:part name="parameters" element="impl:doAuthorizationRedirectRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getBalanceRequest">
@@ -2959,10 +3077,6 @@
   </wsdl:message>
   <wsdl:message name="unBlockRequest">
     <wsdl:part name="parameters" element="impl:unBlockRequest">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="doMassRefundRequest">
-    <wsdl:part name="parameters" element="impl:doMassRefundRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="enableWalletRequest">
@@ -3005,16 +3119,8 @@
     <wsdl:part name="parameters" element="impl:doBankTransferResponse">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="doMassRefundResponse">
-    <wsdl:part name="parameters" element="impl:doMassRefundResponse">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="disableWalletRequest">
     <wsdl:part name="parameters" element="impl:disableWalletRequest">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="doMassCaptureRequest">
-    <wsdl:part name="parameters" element="impl:doMassCaptureRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="createMerchantRequest">
@@ -3027,10 +3133,6 @@
   </wsdl:message>
   <wsdl:message name="createMerchantResponse">
     <wsdl:part name="parameters" element="impl:createMerchantResponse">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="getMassTraitmentDetailsRequest">
-    <wsdl:part name="parameters" element="impl:getMassTraitmentDetailsRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getMerchantSettingsRequest">
@@ -3051,10 +3153,6 @@
   </wsdl:message>
   <wsdl:message name="manageWebWalletRequest">
     <wsdl:part name="parameters" element="impl:manageWebWalletRequest">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="doMassResetResponse">
-    <wsdl:part name="parameters" element="impl:doMassResetResponse">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="doCreditResponse">
@@ -3101,10 +3199,6 @@
     <wsdl:part name="parameters" element="impl:getEncryptionKeyRequest">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="doMassCaptureResponse">
-    <wsdl:part name="parameters" element="impl:doMassCaptureResponse">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="doResetResponse">
     <wsdl:part name="parameters" element="impl:doResetResponse">
     </wsdl:part>
@@ -3119,10 +3213,6 @@
   </wsdl:message>
   <wsdl:message name="unBlockResponse">
     <wsdl:part name="parameters" element="impl:unBlockResponse">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="getMassTraitmentDetailsResponse">
-    <wsdl:part name="parameters" element="impl:getMassTraitmentDetailsResponse">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="doReAuthorizationResponse">
@@ -3240,6 +3330,12 @@
       <wsdl:input name="getWebWalletRequest" message="impl:getWebWalletRequest">
     </wsdl:input>
       <wsdl:output name="getWebWalletResponse" message="impl:getWebWalletResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doAuthorizationRedirect">
+      <wsdl:input name="doAuthorizationRedirectRequest" message="impl:doAuthorizationRedirectRequest">
+    </wsdl:input>
+      <wsdl:output name="doAuthorizationRedirectResponse" message="impl:doAuthorizationRedirectResponse">
     </wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
@@ -3434,32 +3530,6 @@
       <wsdl:input name="isRegisteredRequest" message="impl:isRegisteredRequest">
     </wsdl:input>
       <wsdl:output name="isRegisteredResponse" message="impl:isRegisteredResponse">
-    </wsdl:output>
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:portType name="MassPaymentAPI">
-    <wsdl:operation name="doMassCapture">
-      <wsdl:input name="doMassCaptureRequest" message="impl:doMassCaptureRequest">
-    </wsdl:input>
-      <wsdl:output name="doMassCaptureResponse" message="impl:doMassCaptureResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="doMassRefund">
-      <wsdl:input name="doMassRefundRequest" message="impl:doMassRefundRequest">
-    </wsdl:input>
-      <wsdl:output name="doMassRefundResponse" message="impl:doMassRefundResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="doMassReset">
-      <wsdl:input name="doMassResetRequest" message="impl:doMassResetRequest">
-    </wsdl:input>
-      <wsdl:output name="doMassResetResponse" message="impl:doMassResetResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="getMassTraitmentDetails">
-      <wsdl:input name="getMassTraitmentDetailsRequest" message="impl:getMassTraitmentDetailsRequest">
-    </wsdl:input>
-      <wsdl:output name="getMassTraitmentDetailsResponse" message="impl:getMassTraitmentDetailsResponse">
     </wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
@@ -3830,6 +3900,15 @@
         <wsdlsoap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="doAuthorizationRedirect">
+      <wsdlsoap:operation soapAction="doAuthorizationRedirect"/>
+      <wsdl:input>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="ExtendedAPISoapBinding" type="impl:ExtendedAPI">
     <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -3853,45 +3932,6 @@
     </wsdl:operation>
     <wsdl:operation name="getAlertDetails">
       <wsdlsoap:operation soapAction="getAlertDetails"/>
-      <wsdl:input>
-        <wsdlsoap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output>
-        <wsdlsoap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:binding name="MassPaymentAPISoapBinding" type="impl:MassPaymentAPI">
-    <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="doMassCapture">
-      <wsdlsoap:operation soapAction="doMassCapture"/>
-      <wsdl:input>
-        <wsdlsoap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output>
-        <wsdlsoap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="doMassRefund">
-      <wsdlsoap:operation soapAction="doMassRefund"/>
-      <wsdl:input>
-        <wsdlsoap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output>
-        <wsdlsoap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="doMassReset">
-      <wsdlsoap:operation soapAction="doMassReset"/>
-      <wsdl:input>
-        <wsdlsoap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output>
-        <wsdlsoap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="getMassTraitmentDetails">
-      <wsdlsoap:operation soapAction="getMassTraitmentDetails"/>
       <wsdl:input>
         <wsdlsoap:body use="literal"/>
       </wsdl:input>

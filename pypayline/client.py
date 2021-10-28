@@ -13,14 +13,16 @@ from decimal import Decimal
 
 import six
 
-from pypayline.backends.soap import SoapBackend
+from pypayline.backends.suds_soap import SoapBackend
 from pypayline.exceptions import InvalidCurrencyError, ArgumentsError
 
 
 class PaylineBaseAPI(object):
     """Base class for calling the payline services"""
     backend_class = SoapBackend
-    web_service_version = "19"
+    backend = None
+    http_headers = {}
+    web_service_version = "26"
     api_name = 'PaylineBaseAPI'
 
     currencies = {
@@ -46,17 +48,21 @@ class PaylineBaseAPI(object):
         self.cache = cache
         self.trace = trace
 
-    def setup_backend(self):
-        # Create the header. last char of the base64 token is \n -> remove it
+    def get_auth_token(self):
         key = u'{0}:{1}'.format(self.merchant_id, self.access_key)
         if six.PY2:
             authorization_token = base64.encodestring(key)[:-1]
         else:
-            authorization_token = base64.encodebytes(key.encode('ascii')
-                                                     )[:-1].decode('ascii')
+            authorization_token = base64.encodebytes(
+                key.encode('ascii')
+            )[:-1].decode('ascii')
+        return authorization_token
+
+    def setup_backend(self):
+        # Create the header. last char of the base64 token is \n -> remove it
 
         self.http_headers = {
-            u'Authorization': u'Basic {0}'.format(authorization_token),
+            u'Authorization': u'Basic {0}'.format(self.get_auth_token()),
         }
 
         # Create the webservice client
@@ -64,8 +70,8 @@ class PaylineBaseAPI(object):
         # an invalid location URL. And we use that to differentiate between
         # sandbox/production.
         self.backend = self.backend_class(
-            wsdl=self.soap_wsdl_url.encode('ascii'),
-            location=self.soap_url.encode('ascii'),  # Requir
+            wsdl=self.soap_wsdl_url,
+            location=self.soap_url,
             http_headers=self.http_headers,
             cache=self.api_name if self.cache else None,
             trace=self.trace,
@@ -78,7 +84,7 @@ class PaylineBaseAPI(object):
             payline_host = u'https://homologation.payline.com'
         else:
             payline_host = u'https://services.payline.com'
-        return  '{}/V4/services/{}'.format(payline_host, self.api_name)
+        return '{}/V4/services/{}'.format(payline_host, self.api_name)
 
     @property
     def soap_wsdl_url(self):
@@ -109,9 +115,8 @@ class WebPaymentAPI(PaylineBaseAPI):
     def do_web_payment(
             self, amount, currency, order_ref, return_url, cancel_url,
             selected_contract_list=None,
-            second_selected_contract_list=None,
             notification_url='', recurring_times=None,
-            recurring_period_in_months=None, payline_action=100, taxes=0, country='', buyer=None
+            recurring_period_in_months=None, payline_action=101, taxes=0, country='FR', buyer=None
         ):
         """
         Calls the Payline SOAP API for making a new payment
@@ -159,7 +164,7 @@ class WebPaymentAPI(PaylineBaseAPI):
             recurring_amount = formatted_amount // recurring_times
             first_amount = recurring_amount + (formatted_amount - recurring_times * recurring_amount)
             if recurring_period_in_months is None:
-                raise ArgumentsError(u'The recurring_period_in_months argument should be set with interger values')
+                raise ArgumentsError(u'The recurring_period_in_months argument should be set with integer values')
 
             recurring_periods_map = {
                 1: 40,  # Monthly
@@ -169,7 +174,7 @@ class WebPaymentAPI(PaylineBaseAPI):
             try:
                 recurring_period = recurring_periods_map[int(recurring_period_in_months)]
             except ValueError:
-                raise ArgumentsError(u'The recurring_period_in_months argument should be an interger value')
+                raise ArgumentsError(u'The recurring_period_in_months argument should be an integer value')
             except KeyError:
                 raise ArgumentsError(u'The recurring_period_in_months argument should be in 1, 3 or 6 months')
 
@@ -181,11 +186,19 @@ class WebPaymentAPI(PaylineBaseAPI):
             }
 
         if selected_contract_list is None:
-            selected_contract_list = [{ 'selectedContract': c }
-                                      for c in self.contract_number.split(",")]
+            selected_contract_list = [
+                {
+                    'selectedContract': contract
+                    for contract in self.contract_number.split(",")
+                }
+            ]
         else:
-            selected_contract_list = [{ 'selectedContract': c }
-                                      for c in selected_contract_list]
+            selected_contract_list = [
+                {
+                    'selectedContract': contract
+                    for contract in selected_contract_list
+                }
+            ]
 
         redirect_url, token = self.backend.doWebPayment(
             version=self.web_service_version,
@@ -219,7 +232,7 @@ class WebPaymentAPI(PaylineBaseAPI):
     def get_web_payment_details(self, token):
         """
         Get the status of a payment
-        :param token: Th epayment token (returned by do_web_payment
+        :param token: The payment token (returned by do_web_payment
         :return: tuple
          - result_code = the API result code
          - is_transaction_ok = no fraud detected
@@ -247,7 +260,11 @@ class WebPaymentAPI(PaylineBaseAPI):
 
         try:
             currency_reverse = dict([(v, k) for (k, v) in self.currencies.items()])
-            currency = currency_reverse[int(data['payment']['currency'])]
+            payment = data['payment']
+            if 'currency' in payment:
+                currency = currency_reverse[int(data['payment']['currency'])]
+            else:
+                currency = None
         except (KeyError, TypeError):
             currency = None
 
